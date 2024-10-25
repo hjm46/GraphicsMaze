@@ -1,1 +1,1 @@
-# GraphicsMaze
+# GraphicsProject
