@@ -35,6 +35,9 @@ GLuint model_view_location;
 mat4 model_view = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 GLuint projection_location;
 mat4 projection = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
+float x_coor = 0;
+float y_coor = 0;
+float z_coor = 0;
 
 void init(void)
 {
@@ -44,47 +47,47 @@ void init(void)
     vec4 *positions = (vec4 *) malloc(sizeof(vec4) * num_vertices);
 
     // creating one cube
-    positions[0] = (vec4) { 0.15,  0.15, 0.15, 1.0};
-    positions[1] = (vec4) {-0.15,  0.15, 0.15, 1.0};
-    positions[2] = (vec4) { 0.15, -0.15, 0.15, 1.0};
-    positions[3] = (vec4) { 0.15, -0.15, 0.15, 1.0};
-    positions[4] = (vec4) {-0.15,  0.15, 0.15, 1.0};
-    positions[5] = (vec4) {-0.15, -0.15, 0.15, 1.0};
+    positions[0] = (vec4) { 0.15,  0.15, 1.0, 1.0};
+    positions[1] = (vec4) {-0.15,  0.15, 1.0, 1.0};
+    positions[2] = (vec4) { 0.15, -0.15, 1.0, 1.0};
+    positions[3] = (vec4) { 0.15, -0.15, 1.0, 1.0};
+    positions[4] = (vec4) {-0.15,  0.15, 1.0, 1.0};
+    positions[5] = (vec4) {-0.15, -0.15, 1.0, 1.0};
 
-    positions[6] = (vec4) { 0.15, -0.15, -0.15, 1.0};
-    positions[7] = (vec4) {-0.15, -0.15, -0.15, 1.0};
-    positions[8] = (vec4) { 0.15,  0.15, -0.15, 1.0};
-    positions[9] = (vec4) { 0.15,  0.15, -0.15, 1.0};
-    positions[10] = (vec4){-0.15, -0.15, -0.15, 1.0};
-    positions[11] = (vec4){-0.15,  0.15, -0.15, 1.0};
+    positions[6] = (vec4) { 0.15, -0.15, 0.7, 1.0};
+    positions[7] = (vec4) {-0.15, -0.15, 0.7, 1.0};
+    positions[8] = (vec4) { 0.15,  0.15, 0.7, 1.0};
+    positions[9] = (vec4) { 0.15,  0.15, 0.7, 1.0};
+    positions[10] = (vec4){-0.15, -0.15, 0.7, 1.0};
+    positions[11] = (vec4){-0.15,  0.15, 0.7, 1.0};
 
-    positions[12] = (vec4) {-0.15, -0.15,  0.15, 1.0};
-    positions[13] = (vec4) {-0.15, -0.15, -0.15, 1.0};
-    positions[14] = (vec4) { 0.15, -0.15,  0.15, 1.0};
-    positions[15] = (vec4) { 0.15, -0.15,  0.15, 1.0};
-    positions[16] = (vec4) {-0.15, -0.15, -0.15, 1.0};
-    positions[17] = (vec4) { 0.15, -0.15, -0.15, 1.0};
+    positions[12] = (vec4) {-0.15, -0.15, 1.0, 1.0};
+    positions[13] = (vec4) {-0.15, -0.15, 0.7, 1.0};
+    positions[14] = (vec4) { 0.15, -0.15, 1.0, 1.0};
+    positions[15] = (vec4) { 0.15, -0.15, 1.0, 1.0};
+    positions[16] = (vec4) {-0.15, -0.15, 0.7, 1.0};
+    positions[17] = (vec4) { 0.15, -0.15, 0.7, 1.0};
 
-    positions[18] = (vec4) {-0.15,  0.15,  0.15, 1.0};
-    positions[19] = (vec4) {-0.15,  0.15, -0.15, 1.0};
-    positions[20] = (vec4) {-0.15, -0.15,  0.15, 1.0};
-    positions[21] = (vec4) {-0.15, -0.15,  0.15, 1.0};
-    positions[22] = (vec4) {-0.15,  0.15, -0.15, 1.0};
-    positions[23] = (vec4) {-0.15, -0.15, -0.15, 1.0};
+    positions[18] = (vec4) {-0.15,  0.15, 1.0, 1.0};
+    positions[19] = (vec4) {-0.15,  0.15, 0.7, 1.0};
+    positions[20] = (vec4) {-0.15, -0.15, 1.0, 1.0};
+    positions[21] = (vec4) {-0.15, -0.15, 1.0, 1.0};
+    positions[22] = (vec4) {-0.15,  0.15, 0.7, 1.0};
+    positions[23] = (vec4) {-0.15, -0.15, 0.7, 1.0};
 
-    positions[24] = (vec4) { 0.15, 0.15,  0.15, 1.0};
-    positions[25] = (vec4) { 0.15, 0.15, -0.15, 1.0};
-    positions[26] = (vec4) {-0.15, 0.15,  0.15, 1.0};
-    positions[27] = (vec4) {-0.15, 0.15,  0.15, 1.0};
-    positions[28] = (vec4) { 0.15, 0.15, -0.15, 1.0};
-    positions[29] = (vec4) {-0.15, 0.15, -0.15, 1.0};
+    positions[24] = (vec4) { 0.15, 0.15, 1.0, 1.0};
+    positions[25] = (vec4) { 0.15, 0.15, 0.7, 1.0};
+    positions[26] = (vec4) {-0.15, 0.15, 1.0, 1.0};
+    positions[27] = (vec4) {-0.15, 0.15, 1.0, 1.0};
+    positions[28] = (vec4) { 0.15, 0.15, 0.7, 1.0};
+    positions[29] = (vec4) {-0.15, 0.15, 0.7, 1.0};
 
-    positions[30] = (vec4) { 0.15, -0.15,  0.15, 1.0};
-    positions[31] = (vec4) { 0.15, -0.15, -0.15, 1.0};
-    positions[32] = (vec4) { 0.15,  0.15,  0.15, 1.0};
-    positions[33] = (vec4) { 0.15,  0.15,  0.15, 1.0};
-    positions[34] = (vec4) { 0.15, -0.15, -0.15, 1.0};
-    positions[35] = (vec4) { 0.15,  0.15, -0.15, 1.0};
+    positions[30] = (vec4) { 0.15, -0.15, 1.0, 1.0};
+    positions[31] = (vec4) { 0.15, -0.15, 0.7, 1.0};
+    positions[32] = (vec4) { 0.15,  0.15, 1.0, 1.0};
+    positions[33] = (vec4) { 0.15,  0.15, 1.0, 1.0};
+    positions[34] = (vec4) { 0.15, -0.15, 0.7, 1.0};
+    positions[35] = (vec4) { 0.15,  0.15, 0.7, 1.0};
 
     // TO-DOs: (Daisy)
     // create upside-down pyramid w/ textures
@@ -206,7 +209,12 @@ void mouse(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
     {
-        
+        x_coor = (x * 2 / 511.0) - 1;
+        y_coor = 1 - (y * 2 / 511.0);
+        if (x_coor * x_coor + y_coor * y_coor <= 1)
+            z_coor = sqrt(1.0 - (x_coor * x_coor + y_coor * y_coor));
+        else
+            return;
     }
 
     glutPostRedisplay();
@@ -214,7 +222,81 @@ void mouse(int button, int state, int x, int y)
 
 void motion(int x, int y)
 {
-    
+    float x_coordinate = (x * 2 / 511.0) - 1;
+    float y_coordinate = 1 - (y * 2 / 511.0);
+    float z_coordinate;
+    if (x_coordinate * x_coordinate + y_coordinate * y_coordinate <= 1)
+        z_coordinate = sqrt(1.0 - (x_coordinate * x_coordinate + y_coordinate * y_coordinate));
+    else
+        return;
+    if (x_coordinate > 1)
+        x_coordinate = 1;
+    if (x_coordinate < -1)
+        x_coordinate = -1;
+    if (y_coordinate > 1)
+        y_coordinate = 1;
+    if (y_coordinate < -1)
+        y_coordinate = -1;
+
+    // printf("%f\n", z_coordinate);
+    vec4 fixed_point = {0.0, 0.0, 0.0, 1.0};
+    vec4 p1 = {x_coor, y_coor, z_coor, 1.0};
+    vec4 p2 = {x_coordinate, y_coordinate, z_coordinate, 1.0};
+
+    vec4 u = vec_sub(p1, fixed_point);
+    vec4 v = vec_sub(p2, fixed_point);
+
+    // vector u x v is the about vector (cross product to get vector)
+    vec4 about_vec = cross_prod(u, v);
+    about_vec = normalize(magnitude(about_vec), about_vec);
+
+    // θ = cos-1 [ (a * b) / (|a| * |b|) ]
+    float dot_product = dot_prod(u, v);
+    float u_magnitude = magnitude(u);
+    float v_magnitude = magnitude(v);
+    // make sure that there is no division by 0!
+    if (u_magnitude == 0 || v_magnitude == 0)
+        return;
+    float m = u_magnitude * v_magnitude;
+    float theta;
+    // need to check that acosf is valid and will not be nan
+    if ((dot_product / m) > 1.0) 
+        theta = acosf(1.0) * 180.0 / M_PI;
+    else if ((dot_product / m) < -1.0)
+        theta = acosf(-1.0) * 180.0 / M_PI;
+    else
+        theta = acosf(dot_product / m) * 180.0 / M_PI;
+    mat4 r_z = z_rotate(theta);
+
+    // R = R𝑥 (−𝜃𝑥 )R𝑦 (𝜃𝑦 )R𝑧 (45)R𝑦 (−𝜃𝑦 )R𝑥 (𝜃𝑥 )
+    float d = sqrt((about_vec.y * about_vec.y) + (about_vec.z * about_vec.z));
+    if ((about_vec.y * about_vec.y) + (about_vec.z * about_vec.z) < 0) 
+        return;
+    if (d == 0)
+        return;
+    mat4 r_x = {
+        {1.0, 0.0, 0.0, 0.0},
+        {0.0, (about_vec.z / d), (about_vec.y / d), 0.0},
+        {0.0, -(about_vec.y / d), (about_vec.z / d), 0.0},
+        {0.0, 0.0, 0.0, 1.0}};
+    mat4 transpose_r_x = transpose(r_x);
+
+    mat4 r_y = {
+        {(d), 0.0, (about_vec.x), 0.0},
+        {0.0, 1.0, 0.0, 0.0},
+        {-(about_vec.x), 0.0, (d), 0.0},
+        {0.0, 0.0, 0.0, 1.0}};
+    mat4 transpose_r_y = transpose(r_y);
+
+    mat4 rotation_matrix = mat_mult(transpose_r_x, mat_mult(transpose_r_y, mat_mult(r_z, mat_mult(r_y, r_x))));
+    curr_trans_matrix = mat_mult(rotation_matrix, curr_trans_matrix);
+
+   //print_m4(curr_trans_matrix);
+
+    x_coor = x_coordinate;
+    y_coor = y_coordinate;
+    z_coor = z_coordinate;
+    glutPostRedisplay();
 }
 
 int main(int argc, char **argv)

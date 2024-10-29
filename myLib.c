@@ -3,8 +3,6 @@
 #include "myLib.h"
 #include <stdio.h>
 #include <math.h>
-#include <OpenGL/OpenGL.h>
-#include <GLUT/glut.h>
 
 void print_v4(vec4 v) {
     printf("[ %7.4f %7.4f %7.4f %7.4f ]\n", v.x, v.y, v.z, v.w);
@@ -248,32 +246,32 @@ mat4 translate(float f1, float f2, float f3) {
 }
 
 mat4 x_rotate(float d) {
-    float r = d * M_PI / 180.0;
+    float r = d * (M_PI / 180.0);
     mat4 m = {
         {1.0, 0.0, 0.0, 0.0},
-        {0.0, (float)cos(r), -(float)sin(r), 0.0},
-        {0.0, (float)sin(r), (float)cos(r), 0.0}, 
+        {0.0, cos(r), sin(r), 0.0},
+        {0.0, -sin(r), cos(r), 0.0}, 
         {0.0, 0.0, 0.0, 1.0}
     };
     return m;
 }
 
 mat4 y_rotate(float d) {
-    float r = d * M_PI / 180.0;
+    float r = d * (M_PI / 180.0);
     mat4 m = {
-        {(float)cos(r), 0.0, (float)sin(r), 0.0},
+        {cos(r), 0.0, -sin(r), 0.0},
         {0.0, 1.0, 0.0, 0.0},
-        {-(float)sin(r), 0.0, (float)cos(r), 0.0}, 
+        {sin(r), 0.0, cos(r), 0.0}, 
         {0.0, 0.0, 0.0, 1.0}
     };
     return m;
 }
 
 mat4 z_rotate(float d) {
-    float r = d * M_PI / 180.0;
+    float r = d *(M_PI / 180.0);
     mat4 m = {
-        {(float)cos(r), (float)sin(r), 0.0, 0.0},
-        {(float)sin(r), (float)cos(r), 0.0, 0.0},
+        {cos(r), sin(r), 0.0, 0.0},
+        {-sin(r), cos(r), 0.0, 0.0},
         {0.0, 0.0, 1.0, 0.0}, 
         {0.0, 0.0, 0.0, 1.0}
     };
@@ -289,4 +287,3 @@ mat4 m4_identity() {
     };
     return m;
 }
-
