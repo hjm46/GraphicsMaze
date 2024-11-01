@@ -26,7 +26,7 @@
 #include <math.h>
 #include <float.h>
 
-#include "myLib.h" // replace this with your library
+#include "myLib.h"
 
 int num_vertices = 1000000;
 GLuint ctm_location;
@@ -216,8 +216,13 @@ void init(void)
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &param);
 
     GLuint vao;
+    #ifdef __APPLE__
     glGenVertexArraysAPPLE(1, &vao);
     glBindVertexArrayAPPLE(vao);
+    #else
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    #endif
 
     // allocating and transfering data to graphic card
     GLuint buffer;
@@ -377,6 +382,9 @@ int main(int argc, char **argv)
     glutInitWindowSize(512, 512);
     glutInitWindowPosition(100,100);
     glutCreateWindow("Project 2/3");
+    #ifndef __APPLE__
+    glewInit();
+    #endif
     init();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);

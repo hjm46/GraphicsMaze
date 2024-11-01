@@ -1,7 +1,9 @@
 #ifndef _MYLIB_H_
 
+#ifdef __APPLE
 #include <OpenGL/OpenGL.h>
 #include <GLUT/glut.h>
+#endif
 
 #define _MYLIB_H_
 
@@ -20,8 +22,8 @@ typedef struct {
 } mat4;
 
 typedef struct {
-    GLfloat x;
-    GLfloat y;
+    float x;
+    float y;
 } vec2;
 
 // Insert function signatures after this line
