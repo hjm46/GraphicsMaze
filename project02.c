@@ -41,6 +41,72 @@ float z_coor = 0;
 int length;
 int width;
 
+void first_row_ground_tex(vec2* tex_coords) {    
+    // first row of blocks has grass (top), grass (side), and dirt
+    // rest will be just dirt
+    int tex = 0;
+    int vertices = 36 * (length + 2) * (width + 2);
+    for(int i = 0; i < vertices; i += 36){
+        // sides: dirt + grass
+        tex_coords[tex] = (vec2) {0.75, 0.75};
+        tex_coords[tex + 1] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 2] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 3] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 4] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 5] = (vec2) {0.50, 1.00};
+
+        tex_coords[tex + 6] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 7] = (vec2) {0.50, 1.00};
+        tex_coords[tex + 8] = (vec2) {0.75, 0.75};
+        tex_coords[tex + 9] = (vec2) {0.75, 0.75};
+        tex_coords[tex + 10] = (vec2) {0.50, 1.00};
+        tex_coords[tex + 11] = (vec2) {0.50, 0.75};
+
+        // bottom: dirt
+        tex_coords[tex + 12] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 13] = (vec2) {0.75, 0.75};
+        tex_coords[tex + 14] = (vec2) {1.00, 1.00};
+        tex_coords[tex + 15] = (vec2) {1.00, 1.00};
+        tex_coords[tex + 16] = (vec2){0.75, 0.75};
+        tex_coords[tex + 17] = (vec2){0.75, 1.00};
+
+        // dirt + grass
+        tex_coords[tex + 18] = (vec2) {0.75, 0.75};
+        tex_coords[tex + 19] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 20] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 21] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 22] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 23] = (vec2) {0.50, 1.00};
+
+        // top: grass
+        tex_coords[tex + 24] = (vec2) {0.0, 0.25};
+        tex_coords[tex + 25] = (vec2) {0.0, 0.0};
+        tex_coords[tex + 26] = (vec2) {0.25, 0.25};
+        tex_coords[tex + 27] = (vec2) {0.25, 0.25};
+        tex_coords[tex + 28] = (vec2) {0.0, 0.0};
+        tex_coords[tex + 29] = (vec2) {0.0, 0.25};
+
+        // dirt + grass
+        tex_coords[tex + 30] = (vec2) {0.50, 1.00};
+        tex_coords[tex + 31] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 32] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 33] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 34] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 35] = (vec2) {0.75, 0.75};
+        tex += 36;
+    }
+}
+
+void ground_dirt(vec2* tex_coords) {
+    // tex_coords[] = (vec2) {0.75, 1.00};
+    // tex_coords[] = (vec2) {0.75, 0.75};
+    // tex_coords[] = (vec2) {1.00, 1.00};
+    // tex_coords[] = (vec2) {1.00, 1.00};
+    // tex_coords[] = (vec2){0.75, 0.75};
+    // tex_coords[] = (vec2){0.75, 1.00};
+}
+
+
 void init(void)
 {
     GLuint program = initShader("vshader.glsl", "fshader.glsl");
@@ -137,61 +203,8 @@ void init(void)
 
     // define texture coords for square
     vec2 *tex_coords = (vec2 *) malloc(sizeof(vec2) * num_vertices);
+    first_row_ground_tex(tex_coords);
     
-    // first row of blocks has grass (top), grass (side), and dirt
-    // rest will be just dirt
-    int tex = 0;
-    int vertices = 36 * (length + 2) * (width + 2);
-    for(int i = 0; i < vertices; i += 36){
-        // sides: dirt + grass
-        tex_coords[tex] = (vec2) {0.75, 0.75};
-        tex_coords[tex + 1] = (vec2) {0.50, 0.75};
-        tex_coords[tex + 2] = (vec2) {0.75, 1.00};
-        tex_coords[tex + 3] = (vec2) {0.75, 1.00};
-        tex_coords[tex + 4] = (vec2) {0.50, 0.75};
-        tex_coords[tex + 5] = (vec2) {0.50, 1.00};
-
-        tex_coords[tex + 6] = (vec2) {0.75, 1.00};
-        tex_coords[tex + 7] = (vec2) {0.50, 1.00};
-        tex_coords[tex + 8] = (vec2) {0.75, 0.75};
-        tex_coords[tex + 9] = (vec2) {0.75, 0.75};
-        tex_coords[tex + 10] = (vec2) {0.50, 1.00};
-        tex_coords[tex + 11] = (vec2) {0.50, 0.75};
-
-        // bottom: dirt
-        tex_coords[tex + 12] = (vec2) {0.75, 1.00};
-        tex_coords[tex + 13] = (vec2) {0.75, 0.75};
-        tex_coords[tex + 14] = (vec2) {1.00, 1.00};
-        tex_coords[tex + 15] = (vec2) {1.00, 1.00};
-        tex_coords[tex + 16] = (vec2){0.75, 0.75};
-        tex_coords[tex + 17] = (vec2){0.75, 1.00};
-
-        // dirt + grass
-        tex_coords[tex + 18] = (vec2) {0.75, 0.75};
-        tex_coords[tex + 19] = (vec2) {0.50, 0.75};
-        tex_coords[tex + 20] = (vec2) {0.75, 1.00};
-        tex_coords[tex + 21] = (vec2) {0.75, 1.00};
-        tex_coords[tex + 22] = (vec2) {0.50, 0.75};
-        tex_coords[tex + 23] = (vec2) {0.50, 1.00};
-
-        // top: grass
-        tex_coords[tex + 24] = (vec2) {0.0, 0.25};
-        tex_coords[tex + 25] = (vec2) {0.0, 0.0};
-        tex_coords[tex + 26] = (vec2) {0.25, 0.25};
-        tex_coords[tex + 27] = (vec2) {0.25, 0.25};
-        tex_coords[tex + 28] = (vec2) {0.0, 0.0};
-        tex_coords[tex + 29] = (vec2) {0.0, 0.25};
-
-        // dirt + grass
-        tex_coords[tex + 30] = (vec2) {0.50, 1.00};
-        tex_coords[tex + 31] = (vec2) {0.75, 1.00};
-        tex_coords[tex + 32] = (vec2) {0.50, 0.75};
-        tex_coords[tex + 33] = (vec2) {0.50, 0.75};
-        tex_coords[tex + 34] = (vec2) {0.75, 1.00};
-        tex_coords[tex + 35] = (vec2) {0.75, 0.75};
-        tex += 36;
-    }
-
 
     // create array of texels, open texture file, and fill array with data
     int tex_width = 64;

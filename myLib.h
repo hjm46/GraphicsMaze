@@ -1,10 +1,5 @@
 #ifndef _MYLIB_H_
 
-#ifdef __APPLE
-#include <OpenGL/OpenGL.h>
-#include <GLUT/glut.h>
-#endif
-
 #define _MYLIB_H_
 
 typedef struct {
