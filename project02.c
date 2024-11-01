@@ -28,7 +28,7 @@
 
 #include "myLib.h" // replace this with your library
 
-int num_vertices = 36;
+int num_vertices = 1000000;
 GLuint ctm_location;
 mat4 curr_trans_matrix = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 GLuint model_view_location;
@@ -38,6 +38,8 @@ mat4 projection = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 float x_coor = 0;
 float y_coor = 0;
 float z_coor = 0;
+int length;
+int width;
 
 void init(void)
 {
@@ -90,8 +92,46 @@ void init(void)
     positions[35] = (vec4) { 0.15,  0.15, 0.7, 1.0};
 
     // TO-DOs: (Daisy)
-    // create upside-down pyramid w/ textures
+    // create upside-down pyramid w/ textures --> ground should be slighly larger than l & w of maze
     // need to randomly remove/add cubes later
+    int index = 36;
+    int x_offset = 1;
+    for(int i = 0; i < length + 1; i++) {
+        int pos = 0;
+        for(int j = 0; j < 36; j++) {
+            positions[index + j] = vec_add((vec4) {0.3 * x_offset, 0, 0, 0}, positions[pos]);
+            pos += 1;
+        }
+        x_offset += 1;
+        index += 36;
+    }
+
+    int pos = 0;
+    for(int k = 0; k < length; k++) {
+        for(int i = 0; i < width + 2; i++) {
+            for(int j = 0; j < 36; j++) {
+                positions[index + j] = vec_sub(positions[pos], (vec4) {0, 0, 0.3, 0});
+                pos += 1;
+            }
+            
+            index += 36;
+        }
+    }
+
+    // creating the dirt layers
+
+
+
+
+    
+    // scale and center
+    float scale_by = length;
+    if(length < width) {
+        scale_by = width;
+    }
+    for(int i = 0; i < index; i++) {
+        positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), positions[i]);
+    }
 
     
 
@@ -100,30 +140,56 @@ void init(void)
     
     // first row of blocks has grass (top), grass (side), and dirt
     // rest will be just dirt
-    // top: grass
-    tex_coords[0] = (vec2) {0.0, 0.25};
-    tex_coords[1] = (vec2) {0.0, 0.0};
-    tex_coords[2] = (vec2) {0.25, 0.25};
-    tex_coords[3] = (vec2) {0.25, 0.25};
-    tex_coords[4] = (vec2) {0.0, 0.0};
-    tex_coords[5] = (vec2) {0.0, 0.25};
+    int tex = 0;
+    int vertices = 36 * (length + 2) * (width + 2);
+    for(int i = 0; i < vertices; i += 36){
+        // sides: dirt + grass
+        tex_coords[tex] = (vec2) {0.75, 0.75};
+        tex_coords[tex + 1] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 2] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 3] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 4] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 5] = (vec2) {0.50, 1.00};
 
-    // bottom: dirt
-    tex_coords[6] = (vec2) {0.75, 1.00};
-    tex_coords[7] = (vec2) {0.75, 0.75};
-    tex_coords[8] = (vec2) {1.00, 1.00};
-    tex_coords[9] = (vec2) {1.00, 1.00};
-    tex_coords[10] = (vec2){0.75, 0.75};
-    tex_coords[11] = (vec2){0.75, 1.00};
+        tex_coords[tex + 6] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 7] = (vec2) {0.50, 1.00};
+        tex_coords[tex + 8] = (vec2) {0.75, 0.75};
+        tex_coords[tex + 9] = (vec2) {0.75, 0.75};
+        tex_coords[tex + 10] = (vec2) {0.50, 1.00};
+        tex_coords[tex + 11] = (vec2) {0.50, 0.75};
 
-    // sides: dirt + grass
-    for (int i = 0; i < 24; i += 6){
-        tex_coords[i + 12] = (vec2) {0.50, 0.75};
-        tex_coords[i + 13] = (vec2) {0.50, 1.00};
-        tex_coords[i + 14] = (vec2) {0.75, 0.75};
-        tex_coords[i + 15] = (vec2) {0.75, 0.75};
-        tex_coords[i + 16] = (vec2) {0.50, 1.00};
-        tex_coords[i + 17] = (vec2) {0.75, 1.00};
+        // bottom: dirt
+        tex_coords[tex + 12] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 13] = (vec2) {0.75, 0.75};
+        tex_coords[tex + 14] = (vec2) {1.00, 1.00};
+        tex_coords[tex + 15] = (vec2) {1.00, 1.00};
+        tex_coords[tex + 16] = (vec2){0.75, 0.75};
+        tex_coords[tex + 17] = (vec2){0.75, 1.00};
+
+        // dirt + grass
+        tex_coords[tex + 18] = (vec2) {0.75, 0.75};
+        tex_coords[tex + 19] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 20] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 21] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 22] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 23] = (vec2) {0.50, 1.00};
+
+        // top: grass
+        tex_coords[tex + 24] = (vec2) {0.0, 0.25};
+        tex_coords[tex + 25] = (vec2) {0.0, 0.0};
+        tex_coords[tex + 26] = (vec2) {0.25, 0.25};
+        tex_coords[tex + 27] = (vec2) {0.25, 0.25};
+        tex_coords[tex + 28] = (vec2) {0.0, 0.0};
+        tex_coords[tex + 29] = (vec2) {0.0, 0.25};
+
+        // dirt + grass
+        tex_coords[tex + 30] = (vec2) {0.50, 1.00};
+        tex_coords[tex + 31] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 32] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 33] = (vec2) {0.50, 0.75};
+        tex_coords[tex + 34] = (vec2) {0.75, 1.00};
+        tex_coords[tex + 35] = (vec2) {0.75, 0.75};
+        tex += 36;
     }
 
 
@@ -301,6 +367,11 @@ void motion(int x, int y)
 
 int main(int argc, char **argv)
 {
+    printf("Enter length: ");
+    scanf("%d", &length);
+    printf("Enter width: ");
+    scanf("%d", &width);
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(512, 512);
