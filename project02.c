@@ -49,47 +49,47 @@ void init(void)
     vec4 *positions = (vec4 *) malloc(sizeof(vec4) * num_vertices);
 
     // creating one cube
-    positions[0] = (vec4) { 0.15,  0.15, 1.0, 1.0};
-    positions[1] = (vec4) {-0.15,  0.15, 1.0, 1.0};
-    positions[2] = (vec4) { 0.15, -0.15, 1.0, 1.0};
-    positions[3] = (vec4) { 0.15, -0.15, 1.0, 1.0};
-    positions[4] = (vec4) {-0.15,  0.15, 1.0, 1.0};
-    positions[5] = (vec4) {-0.15, -0.15, 1.0, 1.0};
+    positions[0] = (vec4) { 1.0,  1.0, 1.0, 1.0};
+    positions[1] = (vec4) {-1.0,  1.0, 1.0, 1.0};
+    positions[2] = (vec4) { 1.0, -1.0, 1.0, 1.0};
+    positions[3] = (vec4) { 1.0, -1.0, 1.0, 1.0};
+    positions[4] = (vec4) {-1.0,  1.0, 1.0, 1.0};
+    positions[5] = (vec4) {-1.0, -1.0, 1.0, 1.0};
 
-    positions[6] = (vec4) { 0.15, -0.15, 0.7, 1.0};
-    positions[7] = (vec4) {-0.15, -0.15, 0.7, 1.0};
-    positions[8] = (vec4) { 0.15,  0.15, 0.7, 1.0};
-    positions[9] = (vec4) { 0.15,  0.15, 0.7, 1.0};
-    positions[10] = (vec4){-0.15, -0.15, 0.7, 1.0};
-    positions[11] = (vec4){-0.15,  0.15, 0.7, 1.0};
+    positions[6] = (vec4) { 1.0, -1.0, -1.0, 1.0};
+    positions[7] = (vec4) {-1.0, -1.0, -1.0, 1.0};
+    positions[8] = (vec4) { 1.0,  1.0, -1.0, 1.0};
+    positions[9] = (vec4) { 1.0,  1.0, -1.0, 1.0};
+    positions[10] = (vec4){-1.0, -1.0, -1.0, 1.0};
+    positions[11] = (vec4){-1.0,  1.0, -1.0, 1.0};
 
-    positions[12] = (vec4) {-0.15, -0.15, 1.0, 1.0};
-    positions[13] = (vec4) {-0.15, -0.15, 0.7, 1.0};
-    positions[14] = (vec4) { 0.15, -0.15, 1.0, 1.0};
-    positions[15] = (vec4) { 0.15, -0.15, 1.0, 1.0};
-    positions[16] = (vec4) {-0.15, -0.15, 0.7, 1.0};
-    positions[17] = (vec4) { 0.15, -0.15, 0.7, 1.0};
+    positions[12] = (vec4) {-1.0, -1.0,  1.0, 1.0};
+    positions[13] = (vec4) {-1.0, -1.0, -1.0, 1.0};
+    positions[14] = (vec4) { 1.0, -1.0,  1.0, 1.0};
+    positions[15] = (vec4) { 1.0, -1.0,  1.0, 1.0};
+    positions[16] = (vec4) {-1.0, -1.0, -1.0, 1.0};
+    positions[17] = (vec4) { 1.0, -1.0, -1.0, 1.0};
 
-    positions[18] = (vec4) {-0.15,  0.15, 1.0, 1.0};
-    positions[19] = (vec4) {-0.15,  0.15, 0.7, 1.0};
-    positions[20] = (vec4) {-0.15, -0.15, 1.0, 1.0};
-    positions[21] = (vec4) {-0.15, -0.15, 1.0, 1.0};
-    positions[22] = (vec4) {-0.15,  0.15, 0.7, 1.0};
-    positions[23] = (vec4) {-0.15, -0.15, 0.7, 1.0};
+    positions[18] = (vec4) {-1.0,  1.0,  1.0, 1.0};
+    positions[19] = (vec4) {-1.0,  1.0, -1.0, 1.0};
+    positions[20] = (vec4) {-1.0, -1.0,  1.0, 1.0};
+    positions[21] = (vec4) {-1.0, -1.0,  1.0, 1.0};
+    positions[22] = (vec4) {-1.0,  1.0, -1.0, 1.0};
+    positions[23] = (vec4) {-1.0, -1.0, -1.0, 1.0};
 
-    positions[24] = (vec4) { 0.15, 0.15, 1.0, 1.0};
-    positions[25] = (vec4) { 0.15, 0.15, 0.7, 1.0};
-    positions[26] = (vec4) {-0.15, 0.15, 1.0, 1.0};
-    positions[27] = (vec4) {-0.15, 0.15, 1.0, 1.0};
-    positions[28] = (vec4) { 0.15, 0.15, 0.7, 1.0};
-    positions[29] = (vec4) {-0.15, 0.15, 0.7, 1.0};
+    positions[24] = (vec4) { 1.0, 1.0,  1.0, 1.0};
+    positions[25] = (vec4) { 1.0, 1.0, -1.0, 1.0};
+    positions[26] = (vec4) {-1.0, 1.0,  1.0, 1.0};
+    positions[27] = (vec4) {-1.0, 1.0,  1.0, 1.0};
+    positions[28] = (vec4) { 1.0, 1.0, -1.0, 1.0};
+    positions[29] = (vec4) {-1.0, 1.0, -1.0, 1.0};
 
-    positions[30] = (vec4) { 0.15, -0.15, 1.0, 1.0};
-    positions[31] = (vec4) { 0.15, -0.15, 0.7, 1.0};
-    positions[32] = (vec4) { 0.15,  0.15, 1.0, 1.0};
-    positions[33] = (vec4) { 0.15,  0.15, 1.0, 1.0};
-    positions[34] = (vec4) { 0.15, -0.15, 0.7, 1.0};
-    positions[35] = (vec4) { 0.15,  0.15, 0.7, 1.0};
+    positions[30] = (vec4) { 1.0, -1.0,  1.0, 1.0};
+    positions[31] = (vec4) { 1.0, -1.0, -1.0, 1.0};
+    positions[32] = (vec4) { 1.0,  1.0,  1.0, 1.0};
+    positions[33] = (vec4) { 1.0,  1.0,  1.0, 1.0};
+    positions[34] = (vec4) { 1.0, -1.0, -1.0, 1.0};
+    positions[35] = (vec4) { 1.0,  1.0, -1.0, 1.0};
 
     // TO-DOs: (Daisy)
     // create upside-down pyramid w/ textures --> ground should be slighly larger than l & w of maze
@@ -99,7 +99,7 @@ void init(void)
     for(int i = 0; i < length + 1; i++) {
         int pos = 0;
         for(int j = 0; j < 36; j++) {
-            positions[index + j] = vec_add((vec4) {0.3 * x_offset, 0, 0, 0}, positions[pos]);
+            positions[index + j] = vec_add((vec4) {1 * x_offset, 0, 0, 0}, positions[pos]);
             pos += 1;
         }
         x_offset += 1;
@@ -110,7 +110,7 @@ void init(void)
     for(int k = 0; k < length; k++) {
         for(int i = 0; i < width + 2; i++) {
             for(int j = 0; j < 36; j++) {
-                positions[index + j] = vec_sub(positions[pos], (vec4) {0, 0, 0.3, 0});
+                positions[index + j] = vec_sub(positions[pos], (vec4) {0, 0, 1, 0});
                 pos += 1;
             }
             
@@ -123,7 +123,7 @@ void init(void)
 
 
 
-    
+    // TO-DO: (Daisy)
     // scale and center
     float scale_by = length;
     if(length < width) {
@@ -133,7 +133,7 @@ void init(void)
         positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), positions[i]);
     }
 
-    
+
 
     // define texture coords for square
     vec2 *tex_coords = (vec2 *) malloc(sizeof(vec2) * num_vertices);
