@@ -27,6 +27,7 @@
 #include <float.h>
 
 #include "myLib.h"
+#include "maze.h"
 
 int num_vertices = 1000000;
 GLuint ctm_location;
