@@ -41,12 +41,13 @@ float y_coor = 0;
 float z_coor = 0;
 int length;
 int width;
+int last_for_ground;
 
 void first_row_ground_tex(vec2* tex_coords) {    
     // first row of blocks has grass (top), grass (side), and dirt
     // rest will be just dirt
     int tex = 0;
-    int vertices = 36 * (length + 2) * (width + 2);
+    int vertices = 36 * (length * 2) * (width * 2);
     for(int i = 0; i < vertices; i += 36){
         // sides: dirt + grass
         tex_coords[tex] = (vec2) {0.75, 0.75};
@@ -98,15 +99,86 @@ void first_row_ground_tex(vec2* tex_coords) {
     }
 }
 
-void ground_dirt(vec2* tex_coords) {
-    // tex_coords[] = (vec2) {0.75, 1.00};
-    // tex_coords[] = (vec2) {0.75, 0.75};
-    // tex_coords[] = (vec2) {1.00, 1.00};
-    // tex_coords[] = (vec2) {1.00, 1.00};
-    // tex_coords[] = (vec2){0.75, 0.75};
-    // tex_coords[] = (vec2){0.75, 1.00};
+void ground_dirt(vec2* tex_coords, int start, int last) {
+    for(int i = start; i < last; i += 6){
+        tex_coords[i] = (vec2) {0.75, 1.00};
+        tex_coords[i + 1] = (vec2){0.75, 0.75};
+        tex_coords[i + 2] = (vec2){1.00, 1.00};
+        tex_coords[i + 3] = (vec2){1.00, 1.00};
+        tex_coords[i + 4] = (vec2){0.75, 0.75};
+        tex_coords[i + 5] = (vec2){0.75, 1.00};
+    }
 }
 
+void create_pyramid(vec4* positions, int index) {
+    int size = width * 2;
+    int pyramid[size/2][size][size];
+
+    // intialize to all 0s
+    for (int i = 0; i < size / 2; i++) {
+        for (int j = 0; j < size; j++) {
+            for (int k = 0; k < size; k++) {
+                pyramid[i][j][k] = 0;
+            }
+        }
+    }
+
+    // create the pyramid pattern
+    for (int i = 0; i < size / 2; i++) {
+        for (int j = i; j < size - i; j++) {
+            for (int k = i; k < size - i; k++) {
+                pyramid[i][j][k] = 1;
+            }
+        }
+    }
+
+    // add and remove random cubes
+    for (int i = 0; i < size / 2; i++) {
+        for (int j = 0; j < size; j++) {
+            for (int k = 0; k < size; k++) {
+               if(rand() % 5 == 0) {
+                if (pyramid[i][j][k] == 0)
+                    pyramid[i][j][k] = 1;
+                if (pyramid[i][j][k] == 1)
+                    pyramid[i][j][k] = 0;
+               }
+            }
+        }
+    }
+
+    // print pyramid layers
+    // for (int i = 0; i < size / 2; i++) {
+    //     printf("Level %d:\n", i + 1);
+    //     for (int j = 0; j < size; j++) {
+    //         for (int k = 0; k < size; k++) {
+    //             printf("%d ", pyramid[i][j][k]);
+    //         }
+    //         printf("\n");
+    //     }
+    //     printf("\n");
+    // }
+
+    int factor = 1;
+    for (int i = 0; i < size / 2; i++) {
+        int pos = 0;
+        for (int j = 0; j < size; j++) {
+            for (int k = 0; k < size; k++) {
+                if(pyramid[i][j][k] == 0) {
+                    pos += 36;
+                }
+                if(pyramid[i][j][k] == 1) {
+                    for(int j = 0; j < 36; j++) {
+                        positions[index + j] = vec_sub(positions[pos], (vec4) {0, 2 * factor, 0, 0});
+                        pos += 1;
+                    }
+                    index += 36;
+                }
+            }
+        }
+        factor += 1;
+    }
+    last_for_ground = index;
+}
 
 void init(void)
 {
@@ -158,53 +230,48 @@ void init(void)
     positions[34] = (vec4) { 1.0, -1.0, -1.0, 1.0};
     positions[35] = (vec4) { 1.0,  1.0, -1.0, 1.0};
 
-    // TO-DOs: (Daisy)
-    // create upside-down pyramid w/ textures --> ground should be slighly larger than l & w of maze
-    // need to randomly remove/add cubes later
+    // create upside-down pyramid w/ textures --> ground should be larger than l & w of maze
+    // first layer
     int index = 36;
-    int x_offset = 1;
-    for(int i = 0; i < length + 1; i++) {
-        int pos = 0;
+    int pos = 0;
+    for(int i = 0; i < width * 2 - 1; i++) {
         for(int j = 0; j < 36; j++) {
-            positions[index + j] = vec_add((vec4) {1 * x_offset, 0, 0, 0}, positions[pos]);
+            positions[index + j] = vec_add(positions[pos], (vec4) {2, 0, 0, 0});
             pos += 1;
         }
-        x_offset += 1;
         index += 36;
     }
 
-    int pos = 0;
-    for(int k = 0; k < length; k++) {
-        for(int i = 0; i < width + 2; i++) {
+    pos = 0;
+    for(int k = 0; k < width * 2; k++) {
+        for(int i = 0; i < length * 2 - 1; i++) {
             for(int j = 0; j < 36; j++) {
-                positions[index + j] = vec_sub(positions[pos], (vec4) {0, 0, 1, 0});
+                positions[index + j] = vec_sub(positions[pos], (vec4) {0, 0, 2, 0});
                 pos += 1;
             }
-            
             index += 36;
         }
     }
 
     // creating the dirt layers
+    int start = index;
+    create_pyramid(positions, index);
 
 
-
-
-    // TO-DO: (Daisy)
+    // TO-DO:
     // scale and center
-    float scale_by = length;
+    float scale_by = (length) * 6;
     if(length < width) {
-        scale_by = width;
+        scale_by = (width) * 6;
     }
-    for(int i = 0; i < index; i++) {
-        positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), positions[i]);
+    for(int i = 0; i < last_for_ground; i++) {
+        positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), mat_vec_mult(translate(-length, -length, -length), positions[i]));
     }
-
-
 
     // define texture coords for square
     vec2 *tex_coords = (vec2 *) malloc(sizeof(vec2) * num_vertices);
     first_row_ground_tex(tex_coords);
+    ground_dirt(tex_coords, start, last_for_ground);
     
 
     // create array of texels, open texture file, and fill array with data
@@ -287,6 +354,31 @@ void keyboard(unsigned char key, int mousex, int mousey)
     //printf("%c %i %i ", key, mousex, mousey);
     if(key == 'q')
     	exit(0);
+    // foward
+    if(key == 'w') {
+
+    }
+    // right
+    if(key == 'a') {
+
+    }
+    // backward
+    if(key == 's') {
+
+    }
+    // left
+    if(key == 'd') {
+
+    }
+    // slight right
+    if(key == 'k') {
+
+    }
+    // slight left
+    if(key == 'j') {
+
+    }
+
     glutPostRedisplay();
 }
 
