@@ -1,10 +1,19 @@
+#include <stdbool.h>
+
 typedef struct{
-    int north;
-    int south;
-    int east;
-    int west;
+    bool north;
+    bool south;
+    bool east;
+    bool west;
 } post;
 
-post** gen_maze(int len, int wid);
-void gen_maze_re(int row, int col, post** maze);
-void print_maze(int len, int wid, post** maze);
+typedef struct{
+    int x;
+    int y;
+    int parent_index;
+} cell;
+
+post** gen_maze(int, int);
+void gen_maze_re(int, int, post**);
+void print_maze(int, int, post**);
+cell* shortest_path(int, int, post**);
