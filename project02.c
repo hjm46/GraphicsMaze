@@ -29,7 +29,7 @@
 #include "myLib.h"
 #include "maze.h"
 
-int num_vertices = 1000000;
+int num_vertices = 36;
 GLuint ctm_location;
 mat4 curr_trans_matrix = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 GLuint model_view_location;
@@ -41,13 +41,14 @@ float y_coor = 0;
 float z_coor = 0;
 int length;
 int width;
-int last_for_ground;
+int len;
+int wid;
+int last_for_ground = 0;
+int block_pos = 0;
 
-void first_row_ground_tex(vec2* tex_coords) {    
+void first_row_ground_tex(vec2* tex_coords, int vertices) {    
     // first row of blocks has grass (top), grass (side), and dirt
-    // rest will be just dirt
     int tex = 0;
-    int vertices = 36 * (length * 2) * (width * 2);
     for(int i = 0; i < vertices; i += 36){
         // sides: dirt + grass
         tex_coords[tex] = (vec2) {0.75, 0.75};
@@ -111,7 +112,8 @@ void ground_dirt(vec2* tex_coords, int start, int last) {
 }
 
 void create_pyramid(vec4* positions, int index) {
-    int size = width * 2;
+    srand(time(NULL));
+    int size = width * 4 + 6;
     int pyramid[size/2][size][size];
 
     // intialize to all 0s
@@ -136,7 +138,7 @@ void create_pyramid(vec4* positions, int index) {
     for (int i = 0; i < size / 2; i++) {
         for (int j = 0; j < size; j++) {
             for (int k = 0; k < size; k++) {
-               if(rand() % 5 == 0) {
+               if(rand() % 3 == 0) {
                 if (pyramid[i][j][k] == 0)
                     pyramid[i][j][k] = 1;
                 if (pyramid[i][j][k] == 1)
@@ -146,18 +148,7 @@ void create_pyramid(vec4* positions, int index) {
         }
     }
 
-    // print pyramid layers
-    // for (int i = 0; i < size / 2; i++) {
-    //     printf("Level %d:\n", i + 1);
-    //     for (int j = 0; j < size; j++) {
-    //         for (int k = 0; k < size; k++) {
-    //             printf("%d ", pyramid[i][j][k]);
-    //         }
-    //         printf("\n");
-    //     }
-    //     printf("\n");
-    // }
-
+    // setting the cube positions
     int factor = 1;
     for (int i = 0; i < size / 2; i++) {
         int pos = 0;
@@ -167,8 +158,8 @@ void create_pyramid(vec4* positions, int index) {
                     pos += 36;
                 }
                 if(pyramid[i][j][k] == 1) {
-                    for(int j = 0; j < 36; j++) {
-                        positions[index + j] = vec_sub(positions[pos], (vec4) {0, 2 * factor, 0, 0});
+                    for(int x = 0; x < 36; x++) {
+                        positions[index + x] = vec_sub(positions[pos], (vec4) {0, 2 * factor, 0, 0});
                         pos += 1;
                     }
                     index += 36;
@@ -180,8 +171,247 @@ void create_pyramid(vec4* positions, int index) {
     last_for_ground = index;
 }
 
+void grassy_stone(vec2* tex_coords, int start){
+    for(int i = start; i < start + 36; i += 6){
+        tex_coords[i] = (vec2) {1.00, 0.00};
+        tex_coords[i + 1] = (vec2){0.75, 0.00};
+        tex_coords[i + 2] = (vec2){1.00, 0.25};
+        tex_coords[i + 3] = (vec2){1.00, 0.25};
+        tex_coords[i + 4] = (vec2){0.75, 0.00};
+        tex_coords[i + 5] = (vec2){0.75, 0.25};
+    }
+}
+
+void stone(vec2* tex_coords, int start){
+    for(int i = start; i < start + 36; i += 6){
+        tex_coords[i] = (vec2) {0.25, 0.25};
+        tex_coords[i + 1] = (vec2){0.00, 0.25};
+        tex_coords[i + 2] = (vec2){0.25, 0.50};
+        tex_coords[i + 3] = (vec2){0.25, 0.50};
+        tex_coords[i + 4] = (vec2){0.00, 0.25};
+        tex_coords[i + 5] = (vec2){0.00, 0.50};
+    }
+}
+
+void brick(vec2* tex_coords, int start){
+    for(int i = start; i < start + 36; i += 6){
+        tex_coords[i] = (vec2) {1.00, 0.25};
+        tex_coords[i + 1] = (vec2){0.75, 0.25};
+        tex_coords[i + 2] = (vec2){1.00, 0.50};
+        tex_coords[i + 3] = (vec2){1.00, 0.50};
+        tex_coords[i + 4] = (vec2){0.75, 0.25};
+        tex_coords[i + 5] = (vec2){0.75, 0.50};
+    }
+}
+
+int create_block(vec4* positions, int index, int pos){
+    for(int y = 0; y < 36; y++) {
+        positions[index + y] = vec_add(positions[pos], (vec4) {0, 2, 0, 0});
+        pos += 1;
+    } 
+    return pos;
+}
+
+void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
+    //top border
+    int index = last_for_ground;
+    int offset = 2;
+    printf("+");
+    int pos = 36 * (wid * 4 + 6) * offset + (72);
+    pos = create_block(positions, index, pos);
+    brick(tex_coords, index);
+    index += 36;
+
+    for(int j=0; j<width; j+=1)
+    {
+        printf("---+");
+        for(int x = 0; x < 4; x++){
+            pos = create_block(positions, index, pos);
+            if(x == 3){
+                brick(tex_coords, index);
+            }
+            else
+                stone(tex_coords, index);
+            index += 36;
+        }
+    }
+    printf("   +\n|");
+    for(int x = 0; x < 3; x++){
+        pos += 36;
+    }
+    pos = create_block(positions, index, pos);
+    brick(tex_coords, index);
+    index += 36;
+    // start of new row
+    offset++;
+    pos = 36 * (wid * 4 + 6) * offset + (72);
+    pos = create_block(positions, index, pos);
+    stone(tex_coords, index);
+    index += 36;
+
+    for(int j=0; j<width; j+=1)
+    {
+        printf("   ");
+        for(int x = 0; x < 3; x++){
+            pos += 36;
+        }
+        if(maze[0][j].north == 1) {
+            printf("|");
+            pos = create_block(positions, index, pos);
+            stone(tex_coords, index);
+            index += 36;
+        }
+        else{
+            printf(" ");
+            pos += 36;
+        }       
+    }
+    printf("   |\n");
+    for(int x = 0; x < 3; x++){
+        pos += 36;
+    }
+    pos = create_block(positions, index, pos);
+    stone(tex_coords, index);
+    index += 36;
+    offset++;
+    pos = 36 * (wid * 4 + 6) * offset + (72);
+
+    //interior
+    for(int i=0; i<length; i+=1)
+    {
+        printf("+");
+        pos = create_block(positions, index, pos);
+        brick(tex_coords, index);
+        index += 36;
+        if(maze[i][0].west == 1){
+            printf("---");
+            for(int x = 0; x < 3; x++){
+                pos = create_block(positions, index, pos);
+                stone(tex_coords, index);
+                index += 36;
+            }
+        }
+        else{
+            printf("   ");
+            for(int x = 0; x < 3; x++){
+                pos += 36;
+            }
+        }
+        printf("+");
+        pos = create_block(positions, index, pos);
+        brick(tex_coords, index);
+        index += 36;
+
+        for(int j=1; j<width; j+=1)
+        {
+            if(maze[i][j].west == 1 && maze[i][j-1].east == 1){
+                printf("---");
+                for(int x = 0; x < 3; x++){
+                    pos = create_block(positions, index, pos);
+                    stone(tex_coords, index);
+                    index += 36;
+                }
+            }
+            else{
+                printf("   ");
+                for(int x = 0; x < 3; x++){
+                    pos += 36;
+                }
+            }  
+            printf("+");
+            pos = create_block(positions, index, pos);
+            brick(tex_coords, index);
+            index += 36;
+        }
+
+        if(maze[i][width-1].east == 1){
+            printf("---");
+            for(int x = 0; x < 3; x++){
+                pos = create_block(positions, index, pos);
+                stone(tex_coords, index);
+                index += 36;
+            }
+        }
+        else{
+            printf("   ");
+            for(int x = 0; x < 3; x++){
+                pos += 36;
+            }
+        }  
+        printf("+");
+        pos = create_block(positions, index, pos);
+        brick(tex_coords, index);
+        index += 36;
+
+        printf("\n|");
+        offset++;
+        pos = 36 * (wid * 4 + 6) * offset + (72);
+        pos = create_block(positions, index, pos);
+        stone(tex_coords, index);
+        index += 36;
+        for(int j=0; j<width; j+=1)
+        {
+            printf("   ");
+            for(int x = 0; x < 3; x++){
+                pos += 36;
+            }
+            if(i == length-1 && maze[i][j].south == 1){
+                printf("|");
+                pos = create_block(positions, index, pos);
+                stone(tex_coords, index);
+                index += 36;
+            }
+            else if(maze[i][j].south == 1 && maze[i+1][j].north == 1){
+                printf("|");
+                pos = create_block(positions, index, pos);
+                stone(tex_coords, index);
+                index += 36;
+            }
+            else{
+                printf(" ");
+                pos += 36;
+            }
+        }
+        printf("   |");
+        for(int x = 0; x < 3; x++){
+            pos += 36;
+        }
+        pos = create_block(positions, index, pos);
+        stone(tex_coords, index);
+        index += 36;
+        printf("\n");
+        offset++;
+        pos = 36 * (wid * 4 + 6) * offset + (72);
+    }
+
+    // //bottom border
+    printf("+   +");
+    pos = create_block(positions, index, pos);
+    brick(tex_coords, index);
+    index += 72;
+    pos += 72 + 36;
+    pos = create_block(positions, index, pos);
+    brick(tex_coords, index);
+    index += 36;
+    for(int j=1; j<width+1; j+=1)
+    {
+        printf("---+");
+        for(int x = 0; x < 4; x++){
+            pos = create_block(positions, index, pos);
+            if(x == 3){
+                brick(tex_coords, index);
+            }
+            else
+                stone(tex_coords, index);
+            index += 36;
+        }
+    }
+    printf("\n\n");
+}
+
 void init(void)
 {
+    num_vertices += (36 * (width * 4 + 6) * (length * 4 + 6) * (width * 2)) + (36 * width * 4 * length * 4);
     GLuint program = initShader("vshader.glsl", "fshader.glsl");
     glUseProgram(program);
 
@@ -234,7 +464,7 @@ void init(void)
     // first layer
     int index = 36;
     int pos = 0;
-    for(int i = 0; i < width * 2 - 1; i++) {
+    for(int i = 0; i < width * 4 + 5; i++) {
         for(int j = 0; j < 36; j++) {
             positions[index + j] = vec_add(positions[pos], (vec4) {2, 0, 0, 0});
             pos += 1;
@@ -243,8 +473,8 @@ void init(void)
     }
 
     pos = 0;
-    for(int k = 0; k < width * 2; k++) {
-        for(int i = 0; i < length * 2 - 1; i++) {
+    for(int k = 0; k < width * 4 + 6; k++) {
+        for(int i = 0; i < length * 4 + 5; i++) {
             for(int j = 0; j < 36; j++) {
                 positions[index + j] = vec_sub(positions[pos], (vec4) {0, 0, 2, 0});
                 pos += 1;
@@ -257,22 +487,27 @@ void init(void)
     int start = index;
     create_pyramid(positions, index);
 
+    // define texture coords
+    vec2 *tex_coords = (vec2 *) malloc(sizeof(vec2) * num_vertices);
+    first_row_ground_tex(tex_coords, start);
+    ground_dirt(tex_coords, start, last_for_ground);
+
+    // generating the maze on the platform
+    len = length;
+    wid = width;
+    post** maze = gen_maze(width, length);
+    create_maze(maze, positions, tex_coords);
 
     // TO-DO:
     // scale and center
-    float scale_by = (length) * 6;
-    if(length < width) {
-        scale_by = (width) * 6;
+    // float scale_by = width * 4 + 12;
+    // if(length < width) {
+    //     scale_by = length * 4 + 12;
+    // }
+    float scale_by = width * 20;
+    for(int i = 0; i < num_vertices; i++) {
+        positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), mat_vec_mult(translate(-(width * 4 + 9), 0, -(width * 4 + 9)), positions[i]));
     }
-    for(int i = 0; i < last_for_ground; i++) {
-        positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), mat_vec_mult(translate(-length, -length, -length), positions[i]));
-    }
-
-    // define texture coords for square
-    vec2 *tex_coords = (vec2 *) malloc(sizeof(vec2) * num_vertices);
-    first_row_ground_tex(tex_coords);
-    ground_dirt(tex_coords, start, last_for_ground);
-    
 
     // create array of texels, open texture file, and fill array with data
     int tex_width = 64;
@@ -358,7 +593,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
     if(key == 'w') {
 
     }
-    // right
+    // slide left
     if(key == 'a') {
 
     }
@@ -366,15 +601,15 @@ void keyboard(unsigned char key, int mousex, int mousey)
     if(key == 's') {
 
     }
-    // left
+    // slide right
     if(key == 'd') {
 
     }
-    // slight right
+    // look right
     if(key == 'k') {
 
     }
-    // slight left
+    // look left
     if(key == 'j') {
 
     }
@@ -482,6 +717,7 @@ int main(int argc, char **argv)
     scanf("%d", &length);
     printf("Enter width: ");
     scanf("%d", &width);
+    //printf("%d", width);
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
