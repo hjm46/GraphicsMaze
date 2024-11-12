@@ -562,8 +562,8 @@ void init(void)
     for(int i = 0; i < num_vertices; i++) {
         positions[i] = mat_vec_mult(translate(-(maxX+minX)/2.0, -(maxY+minY)/2.0, -(maxZ+minZ)/2.0), positions[i]);
     }
-    model_view = look_at(0,0, 50, 0,0,1, 0,1,0);
-    projection = frustum(-1,1,-1,1, -1, -100);
+    model_view = look_at(0,0, maxX+10, 0,0,1, 0,1,0);
+    projection = frustum(-1,1,-1,1, -1, -maxX-100);
     
 
     // create array of texels, open texture file, and fill array with data
