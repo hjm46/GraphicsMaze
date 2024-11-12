@@ -46,6 +46,29 @@ int wid;
 int last_for_ground = 0;
 int block_pos = 0;
 
+mat4 look_at(GLfloat eye_x, GLfloat eye_y, GLfloat eye_z, 
+            GLfloat at_x, GLfloat at_y, GLfloat at_z, 
+            GLfloat up_x, GLfloat up_y, GLfloat up_z){
+    vec4 n = {at_x, at_y, at_z, 0};
+    vec4 v_up = {up_x, up_y, up_z, 0};
+
+    vec4 v = vec_sub(v_up, scalar_vec_mult(dot_prod(v_up,n)/dot_prod(n,n), n));
+    vec4 u = cross_prod(v, n);
+
+    vec4 u_prime = normalize(magnitude(u), u);
+    vec4 v_prime = normalize(magnitude(v), v);
+    vec4 n_prime = normalize(magnitude(n), n);
+
+    mat4 rotation = {{u_prime.x, v_prime.x, n_prime.x, 0}, {u_prime.y, v_prime.y, n_prime.y, 0}, {u_prime.z, v_prime.z, n_prime.z, 0}, {0,0,0,1}};
+    return mat_mult(rotation, translate(-eye_x, -eye_y, -eye_z));
+}
+
+mat4 frustum(GLfloat left, GLfloat right, GLfloat bottom,
+GLfloat top, GLfloat near, GLfloat far) {
+    mat4 proj_mat = {{(-2*near)/(right-left),0,0,0}, {0,(-2*near)/(top-bottom),0,0}, {(left+right)/(right-left), (bottom+top)/(top-bottom), (near+far)/(far-near), -1}, {0,0, -(2*near*far)/(far-near),0}};
+    return proj_mat;
+}
+
 void first_row_ground_tex(vec2* tex_coords, int vertices) {    
     // first row of blocks has grass (top), grass (side), and dirt
     int tex = 0;
@@ -506,8 +529,14 @@ void init(void)
     // }
     float scale_by = width * 20;
     for(int i = 0; i < num_vertices; i++) {
-        positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), mat_vec_mult(translate(-(width * 4 + 9), 0, -(width * 4 + 9)), positions[i]));
+        //positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), mat_vec_mult(translate(-(width * 4 + 9), 0, -(width * 4 + 9)), positions[i]));
+        positions[i] = mat_vec_mult(translate(-(width * 4 + 9), 0, -(width * 4 + 9)), positions[i]);
     }
+    // emma: commented out repositioning using scale();
+    // translate island to center and set model_view and projection
+    model_view = look_at(0,0,width, 0,0,1, 0,1,0);
+    projection = frustum(-1,1,-1,1, -1, -100);
+    
 
     // create array of texels, open texture file, and fill array with data
     int tex_width = 64;
