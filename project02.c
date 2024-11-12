@@ -35,6 +35,7 @@ mat4 curr_trans_matrix = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 GLuint model_view_location;
 mat4 model_view = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 GLuint projection_location;
+float maxX;
 mat4 projection = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 float x_coor = 0;
 float y_coor = 0;
@@ -523,20 +524,9 @@ void init(void)
 
     // TO-DO:
     // scale and center
-    // float scale_by = width * 4 + 12;
-    // if(length < width) {
-    //     scale_by = length * 4 + 12;
-    // }
-    // float scale_by = width * 20;
-    // for(int i = 0; i < num_vertices; i++) {
-    //     //positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), mat_vec_mult(translate(-(width * 4 + 9), 0, -(width * 4 + 9)), positions[i]));
-    //     positions[i] = mat_vec_mult(translate(-(width * 4 + 9), 0, -(width * 4 + 9)), positions[i]);
-    // }
-
-    // emma: commented out repositioning using scale();
-    // translate island to center and set model_view and projection
+    // emma: translate island to center and set model_view and projection
     float minX = positions[0].x; float minY = positions[0].y; float minZ = positions[0].z;
-    float maxX = positions[0].x; float maxY = positions[0].y; float maxZ = positions[0].z;
+    maxX = positions[0].x; float maxY = positions[0].y; float maxZ = positions[0].z;
 
     for(int p = 0; p < num_vertices; p++) {
         // looking for largest and smallest point of object
@@ -562,6 +552,7 @@ void init(void)
     for(int i = 0; i < num_vertices; i++) {
         positions[i] = mat_vec_mult(translate(-(maxX+minX)/2.0, -(maxY+minY)/2.0, -(maxZ+minZ)/2.0), positions[i]);
     }
+    // adjust view
     model_view = look_at(0,0, maxX+10, 0,0,1, 0,1,0);
     projection = frustum(-1,1,-1,1, -1, -maxX-100);
     
@@ -669,6 +660,19 @@ void keyboard(unsigned char key, int mousex, int mousey)
     // look left
     if(key == 'j') {
 
+    }
+    // zoom out
+    if(key == '-') {
+        projection = mat_mult(projection, translate(0,0,-5));
+    } 
+    // zoom in
+    if(key == '+') {
+        projection = mat_mult(projection, translate(0,0,5));
+    }
+    // return to default view
+    if(key == ' ') {
+        projection = frustum(-1,1,-1,1, -1, -maxX-100);
+        curr_trans_matrix = (mat4) {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
     }
 
     glutPostRedisplay();
