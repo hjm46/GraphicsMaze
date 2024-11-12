@@ -527,14 +527,42 @@ void init(void)
     // if(length < width) {
     //     scale_by = length * 4 + 12;
     // }
-    float scale_by = width * 20;
-    for(int i = 0; i < num_vertices; i++) {
-        //positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), mat_vec_mult(translate(-(width * 4 + 9), 0, -(width * 4 + 9)), positions[i]));
-        positions[i] = mat_vec_mult(translate(-(width * 4 + 9), 0, -(width * 4 + 9)), positions[i]);
-    }
+    // float scale_by = width * 20;
+    // for(int i = 0; i < num_vertices; i++) {
+    //     //positions[i] = mat_vec_mult(scale(1/scale_by, 1/scale_by, 1/scale_by), mat_vec_mult(translate(-(width * 4 + 9), 0, -(width * 4 + 9)), positions[i]));
+    //     positions[i] = mat_vec_mult(translate(-(width * 4 + 9), 0, -(width * 4 + 9)), positions[i]);
+    // }
+
     // emma: commented out repositioning using scale();
     // translate island to center and set model_view and projection
-    model_view = look_at(0,0,width, 0,0,1, 0,1,0);
+    float minX = positions[0].x; float minY = positions[0].y; float minZ = positions[0].z;
+    float maxX = positions[0].x; float maxY = positions[0].y; float maxZ = positions[0].z;
+
+    for(int p = 0; p < num_vertices; p++) {
+        // looking for largest and smallest point of object
+        if(positions[p].x < minX) {
+            minX = positions[p].x;
+        } if(positions[p].x > maxX) {
+            maxX = positions[p].x;
+        }
+        
+        if(positions[p].y < minY) {
+            minY = positions[p].y;
+        } if(positions[p].y > maxY) {
+            maxY = positions[p].y;
+        }
+        
+        if(positions[p].z < minZ) {
+            minZ = positions[p].z;
+        } if(positions[p].z > maxZ) {
+            maxZ = positions[p].z;
+        }
+    }
+    // translating island to center
+    for(int i = 0; i < num_vertices; i++) {
+        positions[i] = mat_vec_mult(translate(-(maxX+minX)/2.0, -(maxY+minY)/2.0, -(maxZ+minZ)/2.0), positions[i]);
+    }
+    model_view = look_at(0,0, 50, 0,0,1, 0,1,0);
     projection = frustum(-1,1,-1,1, -1, -100);
     
 
