@@ -40,12 +40,14 @@ mat4 projection = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 float x_coor = 0;
 float y_coor = 0;
 float z_coor = 0;
-int length;
-int width;
+extern int length;
+extern int width;
 int len;
 int wid;
 int last_for_ground = 0;
 int last_for_maze_ground = 0;
+vec4 eye = {0,0,0,0};
+vec4 look = {0,0,0,0};
 
 mat4 look_at(GLfloat eye_x, GLfloat eye_y, GLfloat eye_z, 
             GLfloat at_x, GLfloat at_y, GLfloat at_z, 
@@ -70,6 +72,25 @@ GLfloat top, GLfloat near, GLfloat far) {
     return proj_mat;
 }
 
+// for animations
+typedef enum
+{
+    NONE = 0,
+    ENTER_MAZE,
+    WALK_FORWARD,
+    WALK_BACKWARD,
+    SLIDE_LEFT,
+    SLIDE_RIGHT,
+    TURN_RIGHT,
+    TURN_LEFT,
+    SPIN_DEFAULT
+} state;
+state currentState = NONE;
+int isAnimating = 0;
+int current_step = 0;
+int max_steps = 10;
+
+// textures
 void first_row_ground_tex(vec2* tex_coords, int start, int vertices){
     // first row of blocks has grass (top), grass (side), and dirt
     int tex = start;
@@ -712,11 +733,15 @@ void init(void)
             maxZ = positions[p].z;
         }
     }
+
     // translating island to center
     for(int i = 0; i < num_vertices; i++) {
         positions[i] = mat_vec_mult(translate(-(maxX+minX)/2.0, -(maxY+minY)/2.0, -(maxZ+minZ)/2.0), positions[i]);
     }
+
     // adjust view
+    eye = (vec4){0,0,maxX+10,0};
+    look = (vec4){0,0,1,1};
     model_view = look_at(0,0, maxX+10, 0,0,1, 0,1,0);
     projection = frustum(-1,1,-1,1, -1, -maxX-100);
     
@@ -801,29 +826,44 @@ void keyboard(unsigned char key, int mousex, int mousey)
     //printf("%c %i %i ", key, mousex, mousey);
     if(key == 'q')
     	exit(0);
+    //go into maze
+    if(key == 'm') {
+        eye.x = length*4-.1;
+        eye.y = len+5;
+        // printf("maxX: %f, length: %d\n", maxX, length);
+        eye.z = maxX-maxX/2;
+        // printf("eyez: %f\n", eye.z);
+        look.z = len+5;
+        model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
+    }
     // foward
     if(key == 'w') {
-
+        isAnimating = 1;
+        currentState = WALK_FORWARD;
     }
     // slide left
     if(key == 'a') {
-
+        isAnimating = 1;
+        currentState = SLIDE_LEFT;
     }
     // backward
     if(key == 's') {
-
+        isAnimating = 1;
+        currentState = WALK_BACKWARD;
     }
     // slide right
     if(key == 'd') {
-
+        isAnimating = 1;
+        currentState = SLIDE_RIGHT;
     }
     // look right
     if(key == 'k') {
-
+        // model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
     }
     // look left
     if(key == 'j') {
-
+        
+        // model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
     }
     // zoom out
     if(key == '-') {
@@ -936,6 +976,128 @@ void motion(int x, int y)
     glutPostRedisplay();
 }
 
+void idle(void)
+{
+    if(isAnimating)
+    {
+        current_step+=1;
+        if(currentState == NONE)
+        {
+
+        }
+
+        else if(currentState == ENTER_MAZE)
+        {
+    
+        }
+
+        else if(currentState == WALK_FORWARD)
+        {
+            float alpha;
+            if(current_step == max_steps)
+            {
+                current_step = 0;
+                isAnimating = 0;
+                vec4 change = (vec4){0,0,-8,1};
+                vec4 move = vec_add(change,eye);
+                model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
+                eye.z = eye.z-8;
+            }
+
+            else
+            {
+                alpha = (float)current_step/max_steps;
+                vec4 change = (vec4){0,0,-8*alpha, 1};
+                vec4 move = vec_add(change,eye);
+                model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
+            }
+        }
+        
+        else if(currentState == WALK_BACKWARD)
+        {
+            float alpha;
+            if(current_step == max_steps)
+            {
+                current_step = 0;
+                isAnimating = 0;
+                vec4 change = (vec4){0,0,8,1};
+                vec4 move = vec_add(change,eye);
+                model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
+                eye.z = eye.z+8;
+            }
+
+            else
+            {
+                alpha = (float)current_step/max_steps;
+                vec4 change = (vec4){0,0,6*alpha, 1};
+                vec4 move = vec_add(change,eye);
+                model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
+            }
+        }
+
+        else if(currentState == SLIDE_LEFT)
+        {
+            float alpha;
+            if(current_step == max_steps)
+            {
+                current_step = 0;
+                isAnimating = 0;
+                vec4 change = (vec4){-8,0,0,1};
+                vec4 move = vec_add(change,eye);
+                model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
+                eye.x = eye.x-8;
+            }
+
+            else
+            {
+                alpha = (float)current_step/max_steps;
+                vec4 change = (vec4){-8*alpha,0,0, 1};
+                vec4 move = vec_add(change,eye);
+                model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
+            }
+        }
+
+        else if(currentState == SLIDE_RIGHT)
+        {
+            float alpha;
+            if(current_step == max_steps)
+            {
+                current_step = 0;
+                isAnimating = 0;
+                vec4 change = (vec4){8,0,0,1};
+                vec4 move = vec_add(change,eye);
+                model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
+                eye.x = eye.x+8;
+            }
+
+            else
+            {
+                alpha = (float)current_step/max_steps;
+                vec4 change = (vec4){8*alpha,0,0, 1};
+                vec4 move = vec_add(change,eye);
+                model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
+            }
+        }
+
+        else if(currentState == TURN_LEFT)
+        {
+
+        }
+
+        else if(currentState == TURN_RIGHT)
+        {
+
+        }
+
+        else if(currentState == SPIN_DEFAULT)
+        {
+
+        }
+
+        glutPostRedisplay();
+    }
+}
+
 int main(int argc, char **argv)
 {
     printf("Enter length: ");
@@ -957,6 +1119,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
+    glutIdleFunc(idle);
     glutMainLoop();
 
     return 0;
