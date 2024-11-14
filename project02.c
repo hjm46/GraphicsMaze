@@ -45,7 +45,7 @@ int width;
 int len;
 int wid;
 int last_for_ground = 0;
-int block_pos = 0;
+int last_for_maze_ground = 0;
 
 mat4 look_at(GLfloat eye_x, GLfloat eye_y, GLfloat eye_z, 
             GLfloat at_x, GLfloat at_y, GLfloat at_z, 
@@ -70,10 +70,10 @@ GLfloat top, GLfloat near, GLfloat far) {
     return proj_mat;
 }
 
-void first_row_ground_tex(vec2* tex_coords, int vertices) {    
+void first_row_ground_tex(vec2* tex_coords, int start, int vertices){
     // first row of blocks has grass (top), grass (side), and dirt
-    int tex = 0;
-    for(int i = 0; i < vertices; i += 36){
+    int tex = start;
+    for(int i = start; i < vertices; i += 36){
         // sides: dirt + grass
         tex_coords[tex] = (vec2) {0.75, 0.75};
         tex_coords[tex + 1] = (vec2) {0.50, 0.75};
@@ -124,7 +124,74 @@ void first_row_ground_tex(vec2* tex_coords, int vertices) {
     }
 }
 
-void ground_dirt(vec2* tex_coords, int start, int last) {
+void first_row_random(vec4* positions, vec2* tex_coords, int index){
+    srand(time(NULL));
+    int pos = 0;
+    int start = index;
+    int arr[width * 4 + 6][length * 4 + 6];
+
+    for(int k = 0; k < width * 4 + 6; k++) {
+        for(int i = 0; i < length * 4 + 6; i++) {
+            if(k == 0 || k == width * 4 + 5 || i == 0 || i == length * 4 + 5) {
+                if(rand() % 5 == 0)
+                    arr[k][i] = 0;
+                else
+                    arr[k][i] = 1;
+            }
+            else
+                arr[k][i] = 0;
+        }
+    }
+
+    for (int k = 0; k < width * 4 + 6; k++){
+        for (int i = 0; i < length * 4 + 6; i++){
+            if (k == 0 && arr[k][i] == 1)
+            {
+                for (int j = 0; j < 36; j++)
+                {
+                    positions[index + j] = vec_add(positions[pos], (vec4){0, 0, 2, 0});
+                    pos += 1;
+                }
+                index += 36;
+            }
+            else if (k == width * 4 + 5 && arr[k][i] == 1)
+            {
+                for (int j = 0; j < 36; j++)
+                {
+                    positions[index + j] = vec_sub(positions[pos], (vec4){0, 0, 2, 0});
+                    pos += 1;
+                }
+                index += 36;
+            }
+            else if (i == 0 && arr[k][i] == 1)
+            {
+                for (int j = 0; j < 36; j++)
+                {
+                    positions[index + j] = vec_sub(positions[pos], (vec4){2, 0, 0, 0});
+                    pos += 1;
+                }
+                index += 36;
+            }
+            else if (i == length * 4 + 5 && arr[k][i] == 1)
+            {
+                for (int j = 0; j < 36; j++)
+                {
+                    positions[index + j] = vec_add(positions[pos], (vec4){2, 0, 0, 0});
+                    pos += 1;
+                }
+                index += 36;
+            }
+            else
+                pos += 36;
+        }
+    }
+
+    first_row_ground_tex(tex_coords, start, index);
+    last_for_ground = index;
+}
+
+
+void dirt(vec2* tex_coords, int start, int last) {
     for(int i = start; i < last; i += 6){
         tex_coords[i] = (vec2) {0.75, 1.00};
         tex_coords[i + 1] = (vec2){0.75, 0.75};
@@ -138,30 +205,32 @@ void ground_dirt(vec2* tex_coords, int start, int last) {
 void create_pyramid(vec4* positions, int index) {
     srand(time(NULL));
     int size = width * 4 + 6;
-    int pyramid[size/2][size][size];
+    int size_l = length * 4 + 6;
+    int depth = size/2 - width;
+    int pyramid[depth][size][size_l];
 
     // intialize to all 0s
-    for (int i = 0; i < size / 2; i++) {
+    for (int i = 0; i < depth; i++) {
         for (int j = 0; j < size; j++) {
-            for (int k = 0; k < size; k++) {
+            for (int k = 0; k < size_l; k++) {
                 pyramid[i][j][k] = 0;
             }
         }
     }
 
     // create the pyramid pattern
-    for (int i = 0; i < size / 2; i++) {
+    for (int i = 0; i < depth; i++) {
         for (int j = i; j < size - i; j++) {
-            for (int k = i; k < size - i; k++) {
+            for (int k = i; k < size_l - i; k++) {
                 pyramid[i][j][k] = 1;
             }
         }
     }
 
     // add and remove random cubes
-    for (int i = 0; i < size / 2; i++) {
+    for (int i = 0; i < depth; i++) {
         for (int j = 0; j < size; j++) {
-            for (int k = 0; k < size; k++) {
+            for (int k = 0; k < size_l; k++) {
                if(rand() % 3 == 0) {
                 if (pyramid[i][j][k] == 0)
                     pyramid[i][j][k] = 1;
@@ -174,10 +243,10 @@ void create_pyramid(vec4* positions, int index) {
 
     // setting the cube positions
     int factor = 1;
-    for (int i = 0; i < size / 2; i++) {
+    for (int i = 0; i < depth; i++) {
         int pos = 0;
         for (int j = 0; j < size; j++) {
-            for (int k = 0; k < size; k++) {
+            for (int k = 0; k < size_l; k++) {
                 if(pyramid[i][j][k] == 0) {
                     pos += 36;
                 }
@@ -236,12 +305,57 @@ int create_block(vec4* positions, int index, int pos){
     return pos;
 }
 
+int create_block_back(vec4* positions, int index, int pos){
+    for(int y = 0; y < 36; y++) {
+        positions[index + y] = vec_sub(positions[pos], (vec4) {0, 0, 2, 0});
+        pos += 1;
+    } 
+    return pos;
+}
+
+void create_maze_ground(vec4* positions, vec2* tex_coords){
+    int index = last_for_ground;
+    int pos = 0;
+    int w = wid * 4 + 1;
+    int l = len * 4 + 1;
+
+    // create the floor of maze
+    for(int i = 0; i < w; i++) {
+        for(int j = 0; j < 36; j++) {
+            positions[index + j] = vec_add(positions[pos], (vec4) {0, 2, 0, 0});
+            pos += 1;
+        }
+        grassy_stone(tex_coords, index);
+        index += 36;
+    }
+
+    pos = last_for_ground;
+    for(int k = 0; k < w; k++) {
+        for(int i = 1; i < l; i++) {
+            for(int j = 0; j < 36; j++) {
+                positions[index + j] = vec_sub(positions[pos], (vec4) {0, 0, 2, 0});
+                pos += 1;
+            }
+            grassy_stone(tex_coords, index);
+            index += 36;
+        }
+    }
+
+    // translate into correct position
+    for(int i = last_for_ground; i < index; i++){
+        positions[i] = mat_vec_mult(translate(4, 0, -6), positions[i]);
+    }
+
+    last_for_maze_ground = index;
+}
+
 void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
     //top border
-    int index = last_for_ground;
-    int offset = 2;
+    int index = last_for_maze_ground;
+    int offset = 3;
     printf("+");
     int pos = 36 * (wid * 4 + 6) * offset + (72);
+    int pos_back = 0;
     pos = create_block(positions, index, pos);
     brick(tex_coords, index);
     index += 36;
@@ -271,7 +385,13 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
     pos = 36 * (wid * 4 + 6) * offset + (72);
     pos = create_block(positions, index, pos);
     stone(tex_coords, index);
+    pos_back = index;
     index += 36;
+    for(int i = 0; i < 2; i++){
+        pos_back = create_block_back(positions, index, pos_back);
+        stone(tex_coords, index);
+        index += 36;
+    }
 
     for(int j=0; j<width; j+=1)
     {
@@ -283,7 +403,13 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
             printf("|");
             pos = create_block(positions, index, pos);
             stone(tex_coords, index);
+            pos_back = index;
             index += 36;
+            for(int i = 0; i < 2; i++){
+                pos_back = create_block_back(positions, index, pos_back);
+                stone(tex_coords, index);
+                index += 36;
+            }
         }
         else{
             printf(" ");
@@ -296,8 +422,16 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
     }
     pos = create_block(positions, index, pos);
     stone(tex_coords, index);
+    pos_back = index;
     index += 36;
     offset++;
+    pos = 36 * (wid * 4 + 6) * offset + (72);
+    for(int i = 0; i < 2; i++){
+        pos_back = create_block_back(positions, index, pos_back);
+        stone(tex_coords, index);
+        index += 36;
+    }
+    offset+=2;
     pos = 36 * (wid * 4 + 6) * offset + (72);
 
     //interior
@@ -372,7 +506,13 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
         pos = 36 * (wid * 4 + 6) * offset + (72);
         pos = create_block(positions, index, pos);
         stone(tex_coords, index);
+        pos_back = index;
         index += 36;
+        for(int i = 0; i < 2; i++){
+            pos_back = create_block_back(positions, index, pos_back);
+            stone(tex_coords, index);
+            index += 36;
+        }
         for(int j=0; j<width; j+=1)
         {
             printf("   ");
@@ -383,13 +523,25 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
                 printf("|");
                 pos = create_block(positions, index, pos);
                 stone(tex_coords, index);
+                pos_back = index;
                 index += 36;
+                for(int i = 0; i < 2; i++){
+                    pos_back = create_block_back(positions, index, pos_back);
+                    stone(tex_coords, index);
+                    index += 36;
+                }
             }
             else if(maze[i][j].south == 1 && maze[i+1][j].north == 1){
                 printf("|");
                 pos = create_block(positions, index, pos);
                 stone(tex_coords, index);
+                pos_back = index;
                 index += 36;
+                for(int i = 0; i < 2; i++){
+                    pos_back = create_block_back(positions, index, pos_back);
+                    stone(tex_coords, index);
+                    index += 36;
+                }
             }
             else{
                 printf(" ");
@@ -402,9 +554,15 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
         }
         pos = create_block(positions, index, pos);
         stone(tex_coords, index);
+        pos_back = index;
         index += 36;
+        for(int i = 0; i < 2; i++){
+            pos_back = create_block_back(positions, index, pos_back);
+            stone(tex_coords, index);
+            index += 36;
+        }
         printf("\n");
-        offset++;
+        offset+=3;
         pos = 36 * (wid * 4 + 6) * offset + (72);
     }
 
@@ -431,11 +589,16 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
         }
     }
     printf("\n\n");
+
+    for(int i = last_for_maze_ground; i < index; i++){
+        positions[i] = mat_vec_mult(translate(0, 2, 0), positions[i]);
+    }
 }
 
 void init(void)
 {
-    num_vertices += (36 * (width * 4 + 6) * (length * 4 + 6) * (width * 2)) + (36 * width * 4 * length * 4);
+    srand(time(NULL));
+    num_vertices += (36 * (width * 4 + 7) * (length * 4 + 7) * (width * 2)) + (36 * width * 4 * length * 4);
     GLuint program = initShader("vshader.glsl", "fshader.glsl");
     glUseProgram(program);
 
@@ -508,18 +671,20 @@ void init(void)
     }
 
     // creating the dirt layers
-    int start = index;
+    int first_layer_end = index;
     create_pyramid(positions, index);
 
     // define texture coords
     vec2 *tex_coords = (vec2 *) malloc(sizeof(vec2) * num_vertices);
-    first_row_ground_tex(tex_coords, start);
-    ground_dirt(tex_coords, start, last_for_ground);
+    first_row_ground_tex(tex_coords, 0, first_layer_end);
+    dirt(tex_coords, first_layer_end, last_for_ground);
+    first_row_random(positions, tex_coords, last_for_ground);
 
     // generating the maze on the platform
     len = length;
     wid = width;
     post** maze = gen_maze(width, length);
+    create_maze_ground(positions, tex_coords);
     create_maze(maze, positions, tex_coords);
 
     // TO-DO:
