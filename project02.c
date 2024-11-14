@@ -190,7 +190,6 @@ void first_row_random(vec4* positions, vec2* tex_coords, int index){
     last_for_ground = index;
 }
 
-
 void dirt(vec2* tex_coords, int start, int last) {
     for(int i = start; i < last; i += 6){
         tex_coords[i] = (vec2) {0.75, 1.00};
@@ -343,7 +342,7 @@ void create_maze_ground(vec4* positions, vec2* tex_coords){
 
     // translate into correct position
     for(int i = last_for_ground; i < index; i++){
-        positions[i] = mat_vec_mult(translate(4, 0, -6), positions[i]);
+        positions[i] = mat_vec_mult(translate(4, 0, -4), positions[i]);
     }
 
     last_for_maze_ground = index;
@@ -352,7 +351,7 @@ void create_maze_ground(vec4* positions, vec2* tex_coords){
 void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
     //top border
     int index = last_for_maze_ground;
-    int offset = 3;
+    int offset = 2;
     printf("+");
     int pos = 36 * (wid * 4 + 6) * offset + (72);
     int pos_back = 0;
