@@ -158,11 +158,16 @@ void first_row_random(vec4* positions, vec2* tex_coords, int index){
     srand(time(NULL));
     int pos = 0;
     int start = index;
-    int arr[width * 4 + 6][length * 4 + 6];
+    int size = 0;
+    if(width > length)
+        size = width * 4 + 6;
+    else
+        size = length * 4 + 6;
+    int arr[size][size];
 
-    for(int k = 0; k < width * 4 + 6; k++) {
-        for(int i = 0; i < length * 4 + 6; i++) {
-            if(k == 0 || k == width * 4 + 5 || i == 0 || i == length * 4 + 5) {
+    for(int k = 0; k < size; k++) {
+        for(int i = 0; i < size; i++) {
+            if(k == 0 || k == size - 1 || i == 0 || i == size -1) {
                 if(rand() % 5 == 0)
                     arr[k][i] = 0;
                 else
@@ -173,8 +178,8 @@ void first_row_random(vec4* positions, vec2* tex_coords, int index){
         }
     }
 
-    for (int k = 0; k < width * 4 + 6; k++){
-        for (int i = 0; i < length * 4 + 6; i++){
+    for (int k = 0; k < size; k++){
+        for (int i = 0; i < size; i++){
             if (k == 0 && arr[k][i] == 1)
             {
                 for (int j = 0; j < 36; j++)
@@ -184,7 +189,7 @@ void first_row_random(vec4* positions, vec2* tex_coords, int index){
                 }
                 index += 36;
             }
-            else if (k == width * 4 + 5 && arr[k][i] == 1)
+            else if (k == size - 1 && arr[k][i] == 1)
             {
                 for (int j = 0; j < 36; j++)
                 {
@@ -202,7 +207,7 @@ void first_row_random(vec4* positions, vec2* tex_coords, int index){
                 }
                 index += 36;
             }
-            else if (i == length * 4 + 5 && arr[k][i] == 1)
+            else if (i == size - 1 && arr[k][i] == 1)
             {
                 for (int j = 0; j < 36; j++)
                 {
@@ -360,7 +365,7 @@ void create_maze_ground(vec4* positions, vec2* tex_coords){
     int l = len * 4 + 1;
 
     // create the floor of maze
-    for(int i = 0; i < w; i++) {
+    for(int i = 0; i < l; i++) {
         for(int j = 0; j < 36; j++) {
             positions[index + j] = vec_add(positions[pos], (vec4) {0, 2, 0, 0});
             pos += 1;
@@ -370,8 +375,8 @@ void create_maze_ground(vec4* positions, vec2* tex_coords){
     }
 
     pos = last_for_ground;
-    for(int k = 0; k < w; k++) {
-        for(int i = 1; i < l; i++) {
+    for(int k = 0; k < l; k++) {
+        for(int i = 1; i < w; i++) {
             for(int j = 0; j < 36; j++) {
                 positions[index + j] = vec_sub(positions[pos], (vec4) {0, 0, 2, 0});
                 pos += 1;
@@ -413,7 +418,7 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
     int index = last_for_maze_ground;
     int offset = 2;
     printf("+");
-    int pos = 36 * (wid * 4 + 6) * offset + (72);
+    int pos = 36 * (len * 4 + 6) * offset + (72);
     int pos_back = 0;
     pos = create_block(positions, index, pos);
     brick(tex_coords, index);
@@ -449,7 +454,7 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
     // start of new row
     // | should also be 4 blocks
     offset++;
-    pos = 36 * (wid * 4 + 6) * offset + (72);
+    pos = 36 * (len * 4 + 6) * offset + (72);
     pos = create_block(positions, index, pos);
     stone(tex_coords, index);
     pos_back = index;
@@ -494,7 +499,7 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
     pos_back = index;
     index += 36;
     offset++;
-    pos = 36 * (wid * 4 + 6) * offset + (72);
+    pos = 36 * (len * 4 + 6) * offset + (72);
     for(int i = 0; i < 2; i++){
         pos_back = create_block_back(positions, index, pos_back);
         stone(tex_coords, index);
@@ -502,7 +507,7 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
         index = create_maze_walls_up(positions, tex_coords, index, 1);
     }
     offset+=2;
-    pos = 36 * (wid * 4 + 6) * offset + (72);
+    pos = 36 * (len * 4 + 6) * offset + (72);
 
     //interior
     for(int i=0; i<length; i+=1)
@@ -580,7 +585,7 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
 
         printf("\n|");
         offset++;
-        pos = 36 * (wid * 4 + 6) * offset + (72);
+        pos = 36 * (len * 4 + 6) * offset + (72);
         pos = create_block(positions, index, pos);
         stone(tex_coords, index);
         pos_back = index;
@@ -644,7 +649,7 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
         }
         printf("\n");
         offset+=3;
-        pos = 36 * (wid * 4 + 6) * offset + (72);
+        pos = 36 * (len * 4 + 6) * offset + (72);
     }
 
     // //bottom border
@@ -692,7 +697,7 @@ void create_maze(post** maze, vec4* positions, vec2* tex_coords) {
 void init(void)
 {
     srand(time(NULL));
-    num_vertices += (36 * (width * 4 + 7) * (length * 4 + 7) * (width * 2)) + ((36 * width * 4 * length * 4) * 4) + 36;
+    num_vertices += (36 * (width * 4 + 7) * (length * 4 + 7) * (length * 2)) + ((36 * width * 4 * length * 4) * 4) + 36;
     GLuint program = initShader("vshader.glsl", "fshader.glsl");
     glUseProgram(program);
 
@@ -745,7 +750,7 @@ void init(void)
     // first layer
     int index = 36;
     int pos = 0;
-    for(int i = 0; i < width * 4 + 5; i++) {
+    for(int i = 0; i < length * 4 + 5; i++) {
         for(int j = 0; j < 36; j++) {
             positions[index + j] = vec_add(positions[pos], (vec4) {2, 0, 0, 0});
             pos += 1;
@@ -754,8 +759,8 @@ void init(void)
     }
 
     pos = 0;
-    for(int k = 0; k < width * 4 + 6; k++) {
-        for(int i = 0; i < length * 4 + 5; i++) {
+    for(int k = 0; k < length * 4 + 6; k++) {
+        for(int i = 0; i < width * 4 + 5; i++) {
             for(int j = 0; j < 36; j++) {
                 positions[index + j] = vec_sub(positions[pos], (vec4) {0, 0, 2, 0});
                 pos += 1;
