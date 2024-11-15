@@ -49,6 +49,13 @@ int last_for_maze_ground = 0;
 int last_for_maze = 0;
 vec4 eye = {0,0,0,0};
 vec4 look = {0,0,0,0};
+typedef enum
+{
+    NORTH = 0,
+    SOUTH,
+    EAST, 
+    WEST
+} direction;
 
 mat4 look_at(GLfloat eye_x, GLfloat eye_y, GLfloat eye_z, 
             GLfloat at_x, GLfloat at_y, GLfloat at_z, 
@@ -90,6 +97,7 @@ state currentState = NONE;
 int isAnimating = 0;
 int current_step = 0;
 int max_steps = 10;
+direction current_direction = NORTH;
 
 // textures
 void first_row_ground_tex(vec2* tex_coords, int start, int vertices){
@@ -892,45 +900,100 @@ void keyboard(unsigned char key, int mousex, int mousey)
     //printf("%c %i %i ", key, mousex, mousey);
     if(key == 'q')
     	exit(0);
+
     //go into maze
     if(key == 'm') {
         eye.x = length*4-.1;
         eye.y = len+5;
         // printf("maxX: %f, length: %d\n", maxX, length);
-        eye.z = maxX-maxX/2;
+        eye.z = maxX-maxX/2 - 10;
         // printf("eyez: %f\n", eye.z);
         look.z = len+5;
         model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
     }
+
     // foward
     if(key == 'w') {
         isAnimating = 1;
-        currentState = WALK_FORWARD;
+        if(current_direction == NORTH)
+            currentState = WALK_FORWARD;
+        else if(current_direction == SOUTH)
+            currentState = WALK_BACKWARD;
+        else if(current_direction == EAST)
+            currentState = SLIDE_RIGHT;
+        else if(current_direction == WEST)
+            currentState = SLIDE_LEFT;
     }
+
     // slide left
     if(key == 'a') {
         isAnimating = 1;
-        currentState = SLIDE_LEFT;
+        if(current_direction == NORTH)
+            currentState = SLIDE_LEFT;
+        else if(current_direction == SOUTH)
+            currentState = SLIDE_RIGHT;
+        else if(current_direction == EAST)
+            currentState = WALK_FORWARD;
+        else if(current_direction == WEST)
+            currentState = WALK_BACKWARD;
     }
+
     // backward
     if(key == 's') {
         isAnimating = 1;
-        currentState = WALK_BACKWARD;
+        if(current_direction == NORTH)
+            currentState = WALK_BACKWARD;
+        else if(current_direction == SOUTH)
+            currentState = WALK_FORWARD;
+        else if(current_direction == EAST)
+            currentState = SLIDE_LEFT;
+        else if(current_direction == WEST)
+            currentState = SLIDE_RIGHT;
     }
+
     // slide right
     if(key == 'd') {
         isAnimating = 1;
-        currentState = SLIDE_RIGHT;
+        if(current_direction == NORTH)
+            currentState = SLIDE_RIGHT;
+        else if(current_direction == SOUTH)
+            currentState = SLIDE_LEFT;
+        else if(current_direction == EAST)
+            currentState = WALK_BACKWARD;
+        else if(current_direction == WEST)
+            currentState = WALK_FORWARD;
     }
+
     // look right
     if(key == 'k') {
-        // model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
+        if(current_direction == NORTH)
+            current_direction = EAST;
+        else if(current_direction == EAST)
+            current_direction = SOUTH;
+        else if(current_direction == SOUTH)
+            current_direction = WEST;
+        else if(current_direction == WEST)
+            current_direction = NORTH;
+        
+        isAnimating = 1;
+        currentState = TURN_RIGHT;
     }
+
     // look left
     if(key == 'j') {
-        
-        // model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
+        if(current_direction == NORTH)
+            current_direction = WEST;
+        else if(current_direction == WEST)
+            current_direction = SOUTH;
+        else if(current_direction == SOUTH)
+            current_direction = EAST;
+        else if(current_direction == EAST)
+            current_direction = NORTH;
+
+        isAnimating = 1;
+        currentState = TURN_LEFT;
     }
+
     // zoom out
     if(key == '-') {
         projection = mat_mult(projection, translate(0,0,-5));
@@ -1054,7 +1117,16 @@ void idle(void)
 
         else if(currentState == ENTER_MAZE)
         {
-    
+            // float alpha;
+            // if(current_step == max_steps)
+            // {
+            //     vec4 change_eye = (vec4){length*4-.1, len+5, maxX-maxX/2, 1};
+            //     vec4 change_look = (vec4){0,0,len+5,1};
+            //     vec4 move_eye = vec_add(change_eye, eye);
+            //     vec4 move_look = vec_add(change_look, look);
+            //     model_view = look_at(move_eye.x, move_eye.y, move_eye.z, move_look.x, move_look.y, move_look.z, 0,1,0);
+
+            // }
         }
 
         else if(currentState == WALK_FORWARD)
@@ -1145,14 +1217,66 @@ void idle(void)
             }
         }
 
-        else if(currentState == TURN_LEFT)
+        else if(currentState == TURN_LEFT || currentState == TURN_RIGHT)
         {
+            float alpha;
+            if(current_step == max_steps)
+            {
+                current_step = 0;
+                isAnimating = 0;
+                vec4 change = {};
+                if(current_direction == NORTH)
+                {
+                    change = (vec4){-look.x,0,len+5,0};
+                }
 
-        }
+                else if(current_direction == SOUTH)
+                {
+                    change = (vec4){-look.x,0,-(len+5),0};
+                }
 
-        else if(currentState == TURN_RIGHT)
-        {
+                else if(current_direction == WEST)
+                {
+                    change = (vec4){len+5,0,-look.z,0};
+                }
 
+                else if(current_direction == EAST)
+                {
+                    change = (vec4){-(len+5),0,-look.z,0};
+                }
+
+                vec4 move = vec_add(change,look);
+                model_view = look_at(eye.x, eye.y, eye.z, move.x, move.y, move.z, 0,1,0);
+                look = move;
+            }
+
+            else
+            {
+                alpha = (float)current_step/max_steps;
+                vec4 change = {};
+                if(current_direction == NORTH)
+                {
+                    change = (vec4){-look.x*alpha,0,(len+5)*alpha,0};
+                }
+
+                else if(current_direction == SOUTH)
+                {
+                    change = (vec4){-look.x*alpha,0,-(len+5)*alpha,0};
+                }
+
+                else if(current_direction == WEST)
+                {
+                    change = (vec4){(len+5)*alpha,0,-look.z*alpha,0};
+                }
+
+                else if(current_direction == EAST)
+                {
+                    change = (vec4){-(len+5)*alpha,0,-look.z*alpha,0};
+                }
+
+                vec4 move = vec_add(change,look);
+                model_view = look_at(eye.x, eye.y, eye.z, move.x, move.y, move.z, 0,1,0);
+            }
         }
 
         else if(currentState == SPIN_DEFAULT)
