@@ -158,17 +158,12 @@ void first_row_random(vec4* positions, vec2* tex_coords, int index){
     srand(time(NULL));
     int pos = 0;
     int start = index;
-    int size = 0;
-    if(width > length)
-        size = width * 4 + 6;
-    else
-        size = length * 4 + 6;
-    int arr[size][size];
+    int arr[width * 4 + 6][length * 4 + 6];
 
-    for(int k = 0; k < size; k++) {
-        for(int i = 0; i < size; i++) {
-            if(k == 0 || k == size - 1 || i == 0 || i == size -1) {
-                if(rand() % 5 == 0)
+    for(int k = 0; k < width * 4 + 6; k++) {
+        for(int i = 0; i < length * 4 + 6; i++) {
+            if(k == 0 || k == width * 4 + 5 || i == 0 || i == length * 4 + 5) {
+                if(rand() % 4 == 0)
                     arr[k][i] = 0;
                 else
                     arr[k][i] = 1;
@@ -178,8 +173,8 @@ void first_row_random(vec4* positions, vec2* tex_coords, int index){
         }
     }
 
-    for (int k = 0; k < size; k++){
-        for (int i = 0; i < size; i++){
+    for (int k = 0; k < width * 4 + 6; k++){
+        for (int i = 0; i < length * 4 + 6; i++){
             if (k == 0 && arr[k][i] == 1)
             {
                 for (int j = 0; j < 36; j++)
@@ -189,7 +184,7 @@ void first_row_random(vec4* positions, vec2* tex_coords, int index){
                 }
                 index += 36;
             }
-            else if (k == size - 1 && arr[k][i] == 1)
+            else if (k == width * 4 + 5 && arr[k][i] == 1)
             {
                 for (int j = 0; j < 36; j++)
                 {
@@ -207,7 +202,7 @@ void first_row_random(vec4* positions, vec2* tex_coords, int index){
                 }
                 index += 36;
             }
-            else if (i == size - 1 && arr[k][i] == 1)
+            else if (i == length * 4 + 5 && arr[k][i] == 1)
             {
                 for (int j = 0; j < 36; j++)
                 {
