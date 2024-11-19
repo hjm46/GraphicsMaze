@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/daisychen/Desktop/CS 1566/project02/GraphicsProject",
-      "program": "/Users/daisychen/Desktop/CS 1566/project02/GraphicsProject/build/Debug/outDebug"
+      "cwd": "/Users/emma/Downloads/cs1566/GraphicsProject",
+      "program": "/Users/emma/Downloads/cs1566/GraphicsProject/build/Debug/outDebug"
     }
   ]
 }
