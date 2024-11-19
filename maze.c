@@ -741,7 +741,7 @@ bool collision(int row, int col, int direction, post** maze)
             return true;
         if(direction == 1)
         {
-            if(maze[row-1][col].east == 1)
+            if(maze[row-1][col].west == 1)
                 return true;
             else
                 return false;

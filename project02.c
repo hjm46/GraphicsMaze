@@ -102,8 +102,10 @@ typedef enum
 state currentState = NONE;
 int isAnimating = 0;
 int current_step = 0;
-int max_steps = 10;
+int max_steps = 5;
 direction current_direction = NORTH;
+cell maze_location = {0,0,-1};
+post** maze_struct;
 
 // textures
 void first_row_ground_tex(vec2* tex_coords, int start, int vertices){
@@ -785,6 +787,7 @@ void init(void)
     len = length;
     wid = width;
     post** maze = gen_maze(width, length);
+    maze_struct = maze;
     create_maze_ground(positions, tex_coords);
     create_maze(maze, positions, tex_coords);
 
@@ -987,65 +990,125 @@ void keyboard(unsigned char key, int mousex, int mousey)
 
     //go into maze
     if(key == 'm') {
-        eye.x = length*4-.1;
-        eye.y = len+5;
-        // printf("maxX: %f, length: %d\n", maxX, length);
-        eye.z = maxX-maxX/2 - 10;
-        // printf("eyez: %f\n", eye.z);
-        look.z = len+5;
+        eye.x = width*4-1;
+        eye.y = wid+3;
+        eye.z = wid*3.3;
+        look.z = wid+3;
         model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
+        maze_location.x = 0;
+        maze_location.y = width;
     }
 
     // foward
     if(key == 'w') {
-        isAnimating = 1;
-        if(current_direction == NORTH)
+        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 0, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = WALK_FORWARD;
-        else if(current_direction == SOUTH)
+            maze_location.x+=1;
+        }
+        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 1, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = WALK_BACKWARD;
-        else if(current_direction == EAST)
+            maze_location.x-=1;
+        }
+        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 2, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = SLIDE_RIGHT;
-        else if(current_direction == WEST)
+            maze_location.y+=1;
+        }
+        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 3, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = SLIDE_LEFT;
+            maze_location.y-=1;
+        }
     }
 
     // slide left
     if(key == 'a') {
-        isAnimating = 1;
-        if(current_direction == NORTH)
+        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 3, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = SLIDE_LEFT;
-        else if(current_direction == SOUTH)
+            maze_location.y-=1;
+        }
+        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 2, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = SLIDE_RIGHT;
-        else if(current_direction == EAST)
+            maze_location.y+=1;
+        }
+        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 0, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = WALK_FORWARD;
-        else if(current_direction == WEST)
+            maze_location.x+=1;
+        }
+        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 1, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = WALK_BACKWARD;
+            maze_location.x-=1;
+        }
     }
 
     // backward
     if(key == 's') {
-        isAnimating = 1;
-        if(current_direction == NORTH)
+        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 1, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = WALK_BACKWARD;
-        else if(current_direction == SOUTH)
+            maze_location.x-=1;
+        }
+        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 0, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = WALK_FORWARD;
-        else if(current_direction == EAST)
+            maze_location.x+=1;
+        }
+        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 3, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = SLIDE_LEFT;
-        else if(current_direction == WEST)
+            maze_location.y-=1;
+        }
+        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 2, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = SLIDE_RIGHT;
+            maze_location.y+=1;
+        }
     }
 
     // slide right
     if(key == 'd') {
-        isAnimating = 1;
-        if(current_direction == NORTH)
+        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 2, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = SLIDE_RIGHT;
-        else if(current_direction == SOUTH)
+            maze_location.y+=1;
+        }
+        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 3, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = SLIDE_LEFT;
-        else if(current_direction == EAST)
+            maze_location.y-=1;
+        }
+        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 1, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = WALK_BACKWARD;
-        else if(current_direction == WEST)
+            maze_location.x-=1;
+        }
+        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 0, maze_struct) == false)
+        {
+            isAnimating = 1;
             currentState = WALK_FORWARD;
+            maze_location.x+=1;
+        }
     }
 
     // look right
