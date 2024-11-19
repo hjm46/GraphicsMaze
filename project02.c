@@ -818,7 +818,8 @@ void init(void)
     // sun
     int starting_sun = num_vertices - 36;
     for(int x = 0; x < 36; x++) {
-        positions[starting_sun + x] = mat_vec_mult(translate((maxX)/2, (maxY) * 4, -(maxZ) * (width * 3)), positions[x]);
+        //positions[starting_sun + x] = mat_vec_mult(translate((maxX)/2, (maxY) * 4, -(maxZ) * (width * 3)), positions[x]);
+        positions[starting_sun + x] = mat_vec_mult(translate((maxX+minX)/2.0, ((maxY+minY)/2.0) + 50, (maxZ+minZ)/2.0),positions[x]);
     }
     sand(tex_coords, starting_sun);
 
@@ -1099,12 +1100,12 @@ void keyboard(unsigned char key, int mousex, int mousey)
     // increase shininess
     if(key == 'i') {
         shininess-=1;
-        printf("%f\n", shininess);
+        //printf("%f\n", shininess);
     } 
     // decrease shininess
     if(key == 'u') {
         shininess+=1;
-        printf("%f\n", shininess);
+        //printf("%f\n", shininess);
     }
     glutPostRedisplay();
 }

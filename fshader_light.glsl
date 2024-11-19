@@ -20,7 +20,7 @@ void main()
 		vec4 LL = normalize(L);
 		vec4 H = normalize(LL + VV);
 
-		ambient = color * 0.3;
+		ambient = color * 0.2;
 		diffuse = max(dot(LL, NN), 0.0) * color;
 		specular = pow(max(dot(NN, H), 0.0), shininess) * vec4(1.0, 1.0, 1.0, 1.0);
 		float attenuation = 1/(attenuation_constant + (attenuation_linear * distance) + (attenuation_quadratic * distance * distance));
