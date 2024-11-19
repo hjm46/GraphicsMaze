@@ -322,28 +322,31 @@ cell* shortest_path(int start_row, int start_col, post** maze)
     queue[back] = (cell){start_row, start_col, -1};
 
     //because there is always a path to the end
-    while(visited[0][width]==0)
+    while(visited[length][0]==0)
     {
         int row = queue[front].x;
         int col = queue[front].y;
 
-
         //only two ways to get into and out of a corner
-        //bottom left corner
-        if(row==length && col==0)
+        //top right corner
+        if(row==0 && col==width)
         {
-            if(maze[length-1][0].south==0 && visited[row][col+1]==0)
+            // go south
+            if(maze[0][col-1].east==0 && visited[row+1][col]==0)
             {
                 back+=1;
-                queue[back] = (cell){row, col+1, front};
-                visited[row][col+1] = 1;
+                queue[back] = (cell){row+1, col, front};
+                visited[row+1][col] = 1;
+                // printf("South: %d, %d\n", row+1, col);
             }
 
-            if(maze[length-1][0].west==0 && visited[row-1][col]==0)
+            // go west
+            if(maze[0][col-1].north==0 && visited[row][col-1]==0)
             {
                 back+=1;
-                queue[back] = (cell){row-1, col, front};
-                visited[row-1][col] = 1;
+                queue[back] = (cell){row, col-1, front};
+                visited[row][col-1] = 1;
+                // printf("West: %d, %d\n", row, col-1);
             }
             front+=1;
         }
@@ -357,6 +360,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row, col+1, front};
                 visited[row][col+1] = 1;
+                // printf("ahh\n");
             }
 
             // can go south
@@ -365,6 +369,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row+1, col, front};
                 visited[row+1][col] = 1;
+                // printf("hi\n");
             }
             front+=1;
         }
@@ -377,6 +382,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row, col-1, front};
                 visited[row][col-1] = 1;
+                // printf("bottom rigth s: %d, %d\n", row, col-1);
             }
 
             if(maze[length-1][width-1].east==0 && visited[row-1][col]==0)
@@ -384,6 +390,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row-1, col, front};
                 visited[row-1][col] = 1;
+                // printf("bottom right e: %d, %d\n", row-1, col);
             }
             front+=1;
         }
@@ -397,6 +404,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row, col+1, front};
                 visited[row][col+1] = 1;
+                // printf("a: %d, %d\n", row, col+1);
             }
 
             // can go south
@@ -405,6 +413,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row+1, col, front};
                 visited[row+1][col] = 1;
+                // printf("b: %d, %d\n", row+1, col);
             }
 
             // can go north
@@ -413,6 +422,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row-1, col, front};
                 visited[row-1][col] = 1;
+                // printf("c: %d, %d\n", row-1, col);
             }
             front+=1;
         }
@@ -426,6 +436,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row, col+1, front};
                 visited[row][col+1] = 1;
+                // printf("d: %d, %d\n", row, col+1);
             }
 
             // can go south
@@ -434,6 +445,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row+1, col, front};
                 visited[row+1][col] = 1;
+                // printf("e: %d, %d\n", row+1, col);
             }
 
             // can go east
@@ -442,6 +454,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row, col-1, front};
                 visited[row][col-1] = 1;
+                // printf("f: %d, %d\n", row, col-1);
             }
             front+=1;
         }
@@ -455,6 +468,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row, col-1, front};
                 visited[row][col-1] = 1;
+                // printf("g: %d, %d\n", row, col-1);
             }
 
             // can go south
@@ -463,6 +477,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row+1, col, front};
                 visited[row+1][col] = 1;
+                // printf("h: %d, %d\n", row+1, col);
             }
 
             // can go north
@@ -471,6 +486,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row-1, col, front};
                 visited[row-1][col] = 1;
+                // printf("i: %d, %d\n", row-1, col);
             }
             front+=1;
         }
@@ -484,6 +500,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row, col+1, front};
                 visited[row][col+1] = 1;
+                // printf("j: %d, %d\n", row, col+1);
             }
 
             // can go north
@@ -492,6 +509,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row-1, col, front};
                 visited[row-1][col] = 1;
+                // printf("k: %d, %d\n", row-1, col);
             }
 
             // can go west
@@ -500,6 +518,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row, col-1, front};
                 visited[row][col-1] = 1;
+                // printf("l: %d, %d\n", row, col-1);
             }
             front+=1;
         }
@@ -513,6 +532,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row, col+1, front};
                 visited[row][col+1] = 1;
+                // printf("m: %d, %d\n", row, col+1);
             }
 
             // can move south
@@ -521,6 +541,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row+1, col, front};
                 visited[row+1][col] = 1;
+                // printf("n: %d, %d\n", row+1, col);
             }
 
             // // can move north
@@ -529,6 +550,7 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row-1, col, front};
                 visited[row-1][col] = 1;
+                // printf("o: %d, %d\n", row-1, col);
             }
 
             // // can move west
@@ -537,13 +559,18 @@ cell* shortest_path(int start_row, int start_col, post** maze)
                 back+=1;
                 queue[back] = (cell){row, col-1, front};
                 visited[row][col-1] = 1;
+                // printf("p: %d, %d\n", row, col-1);
             }
             front+=1;
         }
     }
 
-    while(queue[back].x != 0 && queue[back].y != width)
+    // printf("\n");
+    // printf("%d, %d, Length: %d\n", queue[back].x, queue[back].y, length);
+    while(queue[back].x != length && queue[back].y != width)
     {
+        // printf("why\n");
+        // printf("%d, %d\n", queue[back].x, queue[back].y);
         back-=1;
     }
 
@@ -560,10 +587,12 @@ cell* shortest_path(int start_row, int start_col, post** maze)
     index+=2;
     int size = back-index+1;
     cell *path = (cell*)malloc(size*sizeof(cell));
+    // printf("\n");
     for(int i=0; i<size; i+=1)
     {
         path[i] = temp[index];
         index+=1;
+        // printf("%d, %d\n", path[i].x, path[i].y);
     }
 
     free(temp);
@@ -572,10 +601,265 @@ cell* shortest_path(int start_row, int start_col, post** maze)
     return path;
 }
 
+bool collision(int row, int col, int direction, post** maze)
+{
+    if(row>length || col>width || row<0 || col<0)
+        return false;
+    // bottom left corner
+    else if(row == length && col == 0)
+    {
+        if(direction == 0)
+            return false;
+        else if(direction == 3)
+            return true;
+        else if(direction == 1)
+        {
+            if(maze[row-1][col].west == 1)
+                return true;
+            else
+                return false;
+        }   
+        
+        else if(direction == 2)
+        {
+            if(maze[row-1][col].south == 1)
+                return true;
+            else
+                return false;
+        } 
+    }
+
+    // top right corner
+    else if(row == 0 && col == width)
+    {
+        if(direction == 1)
+            return false;
+        else if(direction == 2)
+            return true;
+        else if(direction == 0)
+        {
+            if(maze[row][col-1].east == 1)
+                return true;
+            else
+                return false;
+        }   
+        
+        else if(direction == 3)
+        {
+            if(maze[row][col-1].north == 1)
+                return true;
+            else
+                return false;
+        } 
+    }
+
+    // top left corner
+    else if(row == 0 && col == 0)
+    {
+        if(direction == 1)
+            return true;
+        else if(direction == 3)
+            return true;
+        else if(direction == 0)
+        {
+            if(maze[row][col].west == 1)
+                return true;
+            else
+                return false;
+        }
+
+        else if(direction == 2)
+        {
+            if(maze[row][col].north == 1)
+                return true;
+            else
+                return false;
+        }
+    }
+
+    // bottom right corner
+    else if(row == length && col == width)
+    {
+        if(direction == 0)
+            return true;
+        else if(direction == 2)
+            return true;
+        else if(direction == 1)
+        {
+            if(maze[row-1][col-1].east == 1)
+                return true;
+            else
+                return false;
+        }
+
+        else if(direction == 3)
+        {
+            if(maze[row-1][col-1].south == 1)
+                return true;
+            else
+                return false;
+        }
+    }
+
+    // first row
+    else if(row == 0)
+    {
+        // move south
+        if(direction == 1)
+            return true;
+        if(direction == 0)
+        {
+            if(maze[row][col-1].east == 1)
+                return true;
+            else
+                return false;
+        }
+
+        if(direction == 3)
+        {
+            if(maze[row][col-1].north == 1)
+                return true;
+            else
+                return false;
+        }
+
+        if(direction == 2)
+        {
+            if(maze[row][col].north == 1)
+                return true;
+            else
+                return false;
+        }
+
+    }
+
+    // last row
+    else if(row == length)
+    {
+        // move north
+        if(direction == 0)
+            return true;
+        if(direction == 1)
+        {
+            if(maze[row-1][col].east == 1)
+                return true;
+            else
+                return false;
+        }
+        if(direction == 3)
+        {
+            if(maze[row-1][col-1].south == 1)
+                return true;
+            else
+                return false;
+        }
+        if(direction == 2)
+        {
+            if(maze[row-1][col].south == 1)
+                return true;
+            else
+                return false;
+        }
+    }
+
+    // first column
+    else if(col == 0)
+    {
+        if(direction == 3)
+            return true;
+        if(direction == 0)
+        {
+            if(maze[row][col].west == 1)
+                return true;
+            else
+                return false;
+        }
+        if(direction == 1)
+        {
+            if(maze[row-1][col].west == 1)
+                return true;
+            else
+                return false;
+        }
+        if(direction == 2)
+        {
+            if(maze[row-1][col].south == 1)
+                return true;
+            else
+                return false;
+        }
+    }
+
+    // last column
+    else if (col == width)
+    {
+        if(direction == 2)
+            return true;
+        if(direction == 1)
+        {
+            if(maze[row-1][col-1].east == 1)
+                return true;
+            else
+                return false;
+        }
+        if(direction == 0)
+        {
+            if(maze[row][col-1].east == 1)
+                return true;
+            else
+                return false;
+        }
+        if(direction == 3)
+        {
+            if(maze[row-1][col-1].south == 1)
+                return true;
+            else
+                return false;
+        }
+    }
+
+    // interior
+    else
+    {
+        if(direction == 0)
+        {
+            if(maze[row][col].west == 1)
+                return true;
+            else
+                return false;
+        }
+        if(direction == 1)
+        {
+            if(maze[row-1][col].west == 1)
+                return true;
+            else
+                return false;
+        }
+        if(direction == 3)
+        {
+            if(maze[row][col-1].north == 1)
+                return true;
+            else
+                return false;
+        }
+        if(direction == 2)
+        {
+            if(maze[row][col].north == 1)
+                return true;
+            else
+                return false;
+        }
+    }
+
+    return false;
+}
+
 // int main(int argc, char **argv)
 // {
-//     post** maze = gen_maze(3, 3);
+//     post** maze = gen_maze(4, 4);
 //     print_maze(length, width, maze);
-//     shortest_path(length,0,maze);
+//     printf("Start: %d, %d\n", length, 1);
+//     // shortest_path(0,width,maze);
+//     printf("%d\n", collision(2,3,0,maze));
 //     return 0;
 // }

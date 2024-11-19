@@ -17,3 +17,4 @@ post** gen_maze(int, int);
 void gen_maze_re(int, int, post**);
 void print_maze(int, int, post**);
 cell* shortest_path(int, int, post**);
+bool collision(int, int, int, post**);
