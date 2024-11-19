@@ -25,6 +25,7 @@
 #include <time.h>
 #include <math.h>
 #include <float.h>
+#include <unistd.h>
 
 #include "myLib.h"
 #include "maze.h"
@@ -102,10 +103,13 @@ typedef enum
 state currentState = NONE;
 int isAnimating = 0;
 int current_step = 0;
-int max_steps = 5;
+int max_steps = 12;
 direction current_direction = NORTH;
 cell maze_location = {0,0,-1};
 post** maze_struct;
+int isShortSolve = 0;
+cell* path;
+int path_index = 0;
 
 // textures
 void first_row_ground_tex(vec2* tex_coords, int start, int vertices){
@@ -992,7 +996,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
     if(key == 'm') {
         eye.x = width*4-1;
         eye.y = wid+3;
-        eye.z = wid*3.3;
+        eye.z = width*4.2;
         look.z = wid+3;
         model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
         maze_location.x = 0;
@@ -1001,6 +1005,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
 
     // foward
     if(key == 'w') {
+        // printf("%d, %d, direction: %d\n", maze_location.x, maze_location.y, current_direction);
         if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 0, maze_struct) == false)
         {
             isAnimating = 1;
@@ -1141,6 +1146,12 @@ void keyboard(unsigned char key, int mousex, int mousey)
         currentState = TURN_LEFT;
     }
 
+    if(key == 'c')
+    {
+        isShortSolve = 2;
+        // shortest_path(maze_location.x, maze_location.y, maze_struct);
+    }
+
     // zoom out
     if(key == '-') {
         //projection = mat_mult(projection, translate(0,0,-5));
@@ -1269,6 +1280,7 @@ void motion(int x, int y)
 
 void idle(void)
 {
+
     if(isAnimating)
     {
         current_step+=1;
@@ -1302,6 +1314,8 @@ void idle(void)
                 vec4 move = vec_add(change,eye);
                 model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
                 eye.z = eye.z-8;
+                if(isShortSolve == 1)
+                    isShortSolve = 2;
             }
 
             else
@@ -1324,6 +1338,8 @@ void idle(void)
                 vec4 move = vec_add(change,eye);
                 model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
                 eye.z = eye.z+8;
+                if(isShortSolve == 1)
+                    isShortSolve = 2;
             }
 
             else
@@ -1346,6 +1362,8 @@ void idle(void)
                 vec4 move = vec_add(change,eye);
                 model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
                 eye.x = eye.x-8;
+                if(isShortSolve == 1)
+                    isShortSolve = 2;
             }
 
             else
@@ -1368,6 +1386,8 @@ void idle(void)
                 vec4 move = vec_add(change,eye);
                 model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
                 eye.x = eye.x+8;
+                if(isShortSolve == 1)
+                    isShortSolve = 2;
             }
 
             else
@@ -1388,28 +1408,22 @@ void idle(void)
                 isAnimating = 0;
                 vec4 change = {};
                 if(current_direction == NORTH)
-                {
                     change = (vec4){-look.x,0,len+5,0};
-                }
 
                 else if(current_direction == SOUTH)
-                {
                     change = (vec4){-look.x,0,-(len+5),0};
-                }
 
                 else if(current_direction == WEST)
-                {
                     change = (vec4){len+5,0,-look.z,0};
-                }
 
                 else if(current_direction == EAST)
-                {
                     change = (vec4){-(len+5),0,-look.z,0};
-                }
 
                 vec4 move = vec_add(change,look);
                 model_view = look_at(eye.x, eye.y, eye.z, move.x, move.y, move.z, 0,1,0);
                 look = move;
+                if(isShortSolve == 1)
+                    isShortSolve = 2;
             }
 
             else
@@ -1417,24 +1431,16 @@ void idle(void)
                 alpha = (float)current_step/max_steps;
                 vec4 change = {};
                 if(current_direction == NORTH)
-                {
                     change = (vec4){-look.x*alpha,0,(len+5)*alpha,0};
-                }
 
                 else if(current_direction == SOUTH)
-                {
                     change = (vec4){-look.x*alpha,0,-(len+5)*alpha,0};
-                }
 
                 else if(current_direction == WEST)
-                {
                     change = (vec4){(len+5)*alpha,0,-look.z*alpha,0};
-                }
 
                 else if(current_direction == EAST)
-                {
                     change = (vec4){-(len+5)*alpha,0,-look.z*alpha,0};
-                }
 
                 vec4 move = vec_add(change,look);
                 model_view = look_at(eye.x, eye.y, eye.z, move.x, move.y, move.z, 0,1,0);
@@ -1447,6 +1453,177 @@ void idle(void)
         }
 
         glutPostRedisplay();
+    }
+
+    if(isShortSolve == 2)
+    {
+        if(path_index == 0)
+            path = shortest_path(maze_location.x, maze_location.y, maze_struct);
+
+        int i = path_index;
+        // printf("path: %d, %d\n", path[i].x, path[i].y);
+        // printf("%d, %d, direction: %d\n", maze_location.x, maze_location.y, current_direction);
+        if(maze_location.x == length && maze_location.y == 0)
+        {
+            if(current_direction == SOUTH)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = EAST;
+                isShortSolve = 1;
+            }
+            else if(current_direction == EAST)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = NORTH;
+                isShortSolve = 1;
+            }
+            else if(current_direction == WEST)
+            {
+                currentState = TURN_RIGHT;
+                isAnimating = 1;
+                current_direction = NORTH;
+                isShortSolve = 1;
+            }
+
+            else if(current_direction == NORTH)
+            {
+                isShortSolve = 0;
+                path_index = 0;
+            }
+        }
+        else if(path[i].x > maze_location.x)
+        {
+            if(current_direction == NORTH)
+            {
+                currentState = WALK_FORWARD;
+                isAnimating = 1;
+                path_index+=1;
+                maze_location.x+=1;
+                isShortSolve = 1;
+            }
+            else if(current_direction == SOUTH)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = EAST;
+                isShortSolve = 1;
+            }
+            else if(current_direction == EAST)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = NORTH;
+                isShortSolve = 1;
+            }
+            else if(current_direction == WEST)
+            {
+                currentState = TURN_RIGHT;
+                isAnimating = 1;
+                current_direction = NORTH;
+                isShortSolve = 1;
+            }
+        }
+
+        else if(path[i].x < maze_location.x)
+        {
+            if(current_direction == SOUTH)
+            {
+                currentState = WALK_BACKWARD;
+                isAnimating = 1;
+                path_index+=1;
+                maze_location.x-=1;
+                isShortSolve = 1;
+            }
+            else if(current_direction == NORTH)
+            {
+                currentState = TURN_RIGHT;
+                isAnimating = 1;
+                current_direction = EAST;
+                isShortSolve = 1;
+            }
+            else if(current_direction == EAST)
+            {
+                currentState = TURN_RIGHT;
+                isAnimating = 1;
+                current_direction = SOUTH;
+                isShortSolve = 1;
+            }
+            else if(current_direction == WEST)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = SOUTH;
+                isShortSolve = 1;
+            }
+        }
+
+        else if(path[i].y > maze_location.y)
+        {
+            if(current_direction == EAST)
+            {
+                currentState = SLIDE_RIGHT;
+                isAnimating = 1;
+                path_index+=1;
+                maze_location.y+=1;
+                isShortSolve = 1;
+            }
+            else if(current_direction == WEST)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = NORTH;
+                isShortSolve = 1;
+            }
+            else if(current_direction == NORTH)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = EAST;
+                isShortSolve = 1;
+            }
+            else if(current_direction == SOUTH)
+            {
+                currentState = TURN_RIGHT;
+                isAnimating = 1;
+                current_direction = EAST;
+                isShortSolve = 1;
+            }
+        }
+
+        else if(path[i].y < maze_location.y)
+        {
+            if(current_direction == WEST)
+            {
+                currentState = SLIDE_LEFT;
+                isAnimating = 1;
+                path_index+=1;
+                maze_location.y-=1;
+                isShortSolve = 1;
+            }
+            else if(current_direction == EAST)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = SOUTH;
+                isShortSolve = 1;
+            }
+            else if(current_direction == SOUTH)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = WEST;
+                isShortSolve = 1;
+            }
+            else if(current_direction == NORTH)
+            {
+                currentState = TURN_RIGHT;
+                isAnimating = 1;
+                current_direction = WEST;
+                isShortSolve = 1;
+            }
+        }
     }
 }
 
