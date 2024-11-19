@@ -47,8 +47,14 @@ int wid;
 int last_for_ground = 0;
 int last_for_maze_ground = 0;
 int last_for_maze = 0;
-vec4 eye = {0,0,0,0};
+vec4 eye = {0,0,0,0}; GLuint eye_location;
 vec4 look = {0,0,0,0};
+// light
+vec4 light = {0,0,0,0}; GLuint light_location;
+GLuint shine_location; float shininess = 50;
+GLuint attenuation_a_loc, attenuation_b_loc, attenuation_c_loc;
+float attenuation_a = 0.0; float attenuation_b = 0.0, attenuation_c = 1;
+
 typedef enum
 {
     NORTH = 0,
@@ -693,10 +699,11 @@ void init(void)
 {
     srand(time(NULL));
     num_vertices += (36 * (width * 4 + 7) * (length * 4 + 7) * (length * 2)) + ((36 * width * 4 * length * 4) * 4) + 36;
-    GLuint program = initShader("vshader.glsl", "fshader.glsl");
+    GLuint program = initShader("vshader_light.glsl", "fshader_light.glsl");
     glUseProgram(program);
 
     vec4 *positions = (vec4 *) malloc(sizeof(vec4) * num_vertices);
+    vec4* normal_array = (vec4 *) malloc(sizeof(vec4) * num_vertices);
 
     // creating one cube
     positions[0] = (vec4) { 1.0,  1.0, 1.0, 1.0};
@@ -811,7 +818,8 @@ void init(void)
     // sun
     int starting_sun = num_vertices - 36;
     for(int x = 0; x < 36; x++) {
-        positions[starting_sun + x] = mat_vec_mult(translate((maxX)/2, (maxY) * 4, -(maxZ) * (width * 3)), positions[x]);
+        //positions[starting_sun + x] = mat_vec_mult(translate((maxX)/2, (maxY) * 4, -(maxZ) * (width * 3)), positions[x]);
+        positions[starting_sun + x] = mat_vec_mult(translate((maxX+minX)/2.0, ((maxY+minY)/2.0) + 50, (maxZ+minZ)/2.0),positions[x]);
     }
     sand(tex_coords, starting_sun);
 
@@ -825,7 +833,55 @@ void init(void)
     look = (vec4){0,0,1,1};
     model_view = look_at(0,0, maxX+10, 0,0,1, 0,1,0);
     projection = frustum(-1,1,-1,1, -1, -maxX-100);
-    
+    // set light position
+    light = positions[starting_sun]; light.w = 0.0;
+    print_v4(light);
+
+    // setting normal array
+    for(int d = 0; d < num_vertices; d++) {
+        //front
+        normal_array[d] = (vec4) {0,0,1,0}; d++;
+        normal_array[d] = (vec4) {0,0,1,0}; d++;
+        normal_array[d] = (vec4) {0,0,1,0}; d++;
+        normal_array[d] = (vec4) {0,0,1,0}; d++;
+        normal_array[d] = (vec4) {0,0,1,0}; d++;
+        normal_array[d] = (vec4) {0,0,1,0}; d++;
+        //back
+        normal_array[d] = (vec4) {0,0,-1,0}; d++;
+        normal_array[d] = (vec4) {0,0,-1,0}; d++;
+        normal_array[d] = (vec4) {0,0,-1,0}; d++;
+        normal_array[d] = (vec4) {0,0,-1,0}; d++;
+        normal_array[d] = (vec4) {0,0,-1,0}; d++;
+        normal_array[d] = (vec4) {0,0,-1,0}; d++;
+        //bottom
+        normal_array[d] = (vec4) {0,-1,0,0}; d++;
+        normal_array[d] = (vec4) {0,-1,0,0}; d++;
+        normal_array[d] = (vec4) {0,-1,0,0}; d++;
+        normal_array[d] = (vec4) {0,-1,0,0}; d++;
+        normal_array[d] = (vec4) {0,-1,0,0}; d++;
+        normal_array[d] = (vec4) {0,-1,0,0}; d++;
+        //left
+        normal_array[d] = (vec4) {-1,0,0,0}; d++;
+        normal_array[d] = (vec4) {-1,0,0,0}; d++;
+        normal_array[d] = (vec4) {-1,0,0,0}; d++;
+        normal_array[d] = (vec4) {-1,0,0,0}; d++;
+        normal_array[d] = (vec4) {-1,0,0,0}; d++;
+        normal_array[d] = (vec4) {-1,0,0,0}; d++;
+        //top
+        normal_array[d] = (vec4) {0,1,0,0}; d++;
+        normal_array[d] = (vec4) {0,1,0,0}; d++;
+        normal_array[d] = (vec4) {0,1,0,0}; d++;
+        normal_array[d] = (vec4) {0,1,0,0}; d++;
+        normal_array[d] = (vec4) {0,1,0,0}; d++;
+        normal_array[d] = (vec4) {0,1,0,0}; d++;
+        //right
+        normal_array[d] = (vec4) {1,0,0,0}; d++;
+        normal_array[d] = (vec4) {1,0,0,0}; d++;
+        normal_array[d] = (vec4) {1,0,0,0}; d++;
+        normal_array[d] = (vec4) {1,0,0,0}; d++;
+        normal_array[d] = (vec4) {1,0,0,0}; d++;
+        normal_array[d] = (vec4) {1,0,0,0};
+    }
 
     // create array of texels, open texture file, and fill array with data
     int tex_width = 64;
@@ -862,9 +918,10 @@ void init(void)
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * num_vertices + sizeof(vec2) * num_vertices, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * num_vertices + sizeof(vec2) * num_vertices + sizeof(vec4) * num_vertices, NULL, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * num_vertices, positions);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * num_vertices, sizeof(vec2) * num_vertices, tex_coords);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * num_vertices + sizeof(vec2) * num_vertices, sizeof(vec4) * num_vertices, normal_array);
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");
     glEnableVertexAttribArray(vPosition);
@@ -874,9 +931,24 @@ void init(void)
     glEnableVertexAttribArray(vTexCoord);
     glVertexAttribPointer(vTexCoord, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * num_vertices));
     
+    // Normal array
+    GLuint vNormal = glGetAttribLocation(program, "vNormal");
+    glEnableVertexAttribArray(vNormal);
+    glVertexAttribPointer(vNormal, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * num_vertices + sizeof(vec2) * num_vertices));
+    
     ctm_location = glGetUniformLocation(program, "ctm");
     model_view_location = glGetUniformLocation(program, "model_view");
     projection_location = glGetUniformLocation(program, "projection");
+    
+    GLuint eye_location = glGetUniformLocation(program, "eye_point");
+    glUniform4fv(eye_location, 1, (GLvoid*) &eye);
+    GLuint light_location = glGetUniformLocation(program, "light_position");
+    glUniform4fv(light_location, 1, (GLvoid*) &light);
+
+    shine_location = glGetUniformLocation(program, "shininess");
+    attenuation_a_loc = glGetUniformLocation(program, "attenuation_constant");
+    attenuation_b_loc = glGetUniformLocation(program, "attenuation_linear");
+    attenuation_c_loc = glGetUniformLocation(program, "attenuation_quadratic");
 
     GLuint texture_location = glGetUniformLocation(program, "texture");
     glUniform1i(texture_location, 0);
@@ -897,6 +969,11 @@ void display(void)
     glUniformMatrix4fv(model_view_location, 1, GL_FALSE, (GLfloat *) &model_view);
     glUniformMatrix4fv(projection_location, 1, GL_FALSE, (GLfloat *) &projection);
     
+    glUniform1fv(shine_location, 1, (GLvoid*) &shininess);
+    glUniform1fv(attenuation_a_loc, 1, (GLvoid*) &attenuation_a);
+    glUniform1fv(attenuation_b_loc, 1, (GLvoid*) &attenuation_b);
+    glUniform1fv(attenuation_c_loc, 1, (GLvoid*) &attenuation_c);
+
     glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 
     glutSwapBuffers();
@@ -1003,18 +1080,33 @@ void keyboard(unsigned char key, int mousex, int mousey)
 
     // zoom out
     if(key == '-') {
-        projection = mat_mult(projection, translate(0,0,-5));
+        //projection = mat_mult(projection, translate(0,0,-5));
+        isAnimating = 1;
+        current_direction = SOUTH;
+        currentState = WALK_BACKWARD;
     } 
     // zoom in
     if(key == '+') {
-        projection = mat_mult(projection, translate(0,0,5));
+        //projection = mat_mult(projection, translate(0,0,5));
+        isAnimating = 1;
+        current_direction = NORTH;
+        currentState = WALK_FORWARD;
     }
     // return to default view
     if(key == ' ') {
         projection = frustum(-1,1,-1,1, -1, -maxX-100);
         curr_trans_matrix = (mat4) {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
     }
-
+    // increase shininess
+    if(key == 'i') {
+        shininess-=1;
+        //printf("%f\n", shininess);
+    } 
+    // decrease shininess
+    if(key == 'u') {
+        shininess+=1;
+        //printf("%f\n", shininess);
+    }
     glutPostRedisplay();
 }
 
