@@ -1146,10 +1146,10 @@ void keyboard(unsigned char key, int mousex, int mousey)
         currentState = TURN_LEFT;
     }
 
+    // solve with shortest path
     if(key == 'c')
     {
         isShortSolve = 2;
-        // shortest_path(maze_location.x, maze_location.y, maze_struct);
     }
 
     // zoom out
