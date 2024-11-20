@@ -20,7 +20,6 @@ space: return to inital view
 
 #### still need to do?
 - animation for back to original view
-- animation for move to entrance
 - automatically solve (left-hand rule)
 - move sun
 - types of light (on & off)
