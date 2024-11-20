@@ -55,6 +55,7 @@ vec4 light = {0,0,0,0}; GLuint light_location;
 GLuint shine_location; float shininess = 50;
 GLuint attenuation_a_loc, attenuation_b_loc, attenuation_c_loc;
 float attenuation_a = 0.0; float attenuation_b = 0.0, attenuation_c = 1;
+mat4 rotation_matrix;
 mat4 sun_ctm = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 vec4 *sun_positions;
 vec2 *sun_tex_coords;
@@ -1169,8 +1170,10 @@ void keyboard(unsigned char key, int mousex, int mousey)
     }
     // return to default view
     if(key == ' ') {
-        projection = frustum(-1,1,-1,1, -1, -maxX-100);
-        curr_trans_matrix = (mat4) {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
+        isAnimating = 1;
+        currentState = SPIN_DEFAULT;
+        // projection = frustum(-1,1,-1,1, -1, -maxX-100);
+        // curr_trans_matrix = (mat4) {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
     }
     // increase shininess
     if(key == 'i') {
@@ -1287,7 +1290,7 @@ void motion(int x, int y)
         {0.0, 0.0, 0.0, 1.0}};
     mat4 transpose_r_y = transpose(r_y);
 
-    mat4 rotation_matrix = mat_mult(transpose_r_x, mat_mult(transpose_r_y, mat_mult(r_z, mat_mult(r_y, r_x))));
+    rotation_matrix = mat_mult(transpose_r_x, mat_mult(transpose_r_y, mat_mult(r_z, mat_mult(r_y, r_x))));
     curr_trans_matrix = mat_mult(rotation_matrix, curr_trans_matrix);
 
    //print_m4(curr_trans_matrix);
@@ -1486,7 +1489,21 @@ void idle(void)
 
         else if(currentState == SPIN_DEFAULT)
         {
+            float alpha;
+            if(current_step == max_steps) {
+                current_step = 0;
+                isAnimating = 0;
+                curr_trans_matrix = m4_identity();
+            }
 
+            else {
+                alpha = (float)current_step/max_steps;
+                mat4 change = scalar_mat_mult(alpha, change);
+                change = mat_add(m4_identity(), rotation_matrix);
+                change = inverse(change);
+                curr_trans_matrix = mat_add(change, curr_trans_matrix);
+
+            }
         }
 
         glutPostRedisplay();
