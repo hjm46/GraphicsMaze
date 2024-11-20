@@ -1,7 +1,7 @@
 # GraphicsProject
 
 #### Group Members:
-Jace Martin, Daisy Chen, Emma
+Jace Martin, Daisy Chen, Emma Chau
 
 #### Keys:
 q: quit\
@@ -14,6 +14,8 @@ k: look right
 
 -: zoom out\
 +: zoom in\
+o: turn light off\
+l: turn light on\
 m: go to maze entrance\
 c: solve with shortest path\
 space: return to inital view
