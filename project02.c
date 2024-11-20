@@ -994,11 +994,8 @@ void keyboard(unsigned char key, int mousex, int mousey)
 
     //go into maze
     if(key == 'm') {
-        eye.x = width*4-1;
-        eye.y = wid+3;
-        eye.z = width*4.2;
-        look.z = wid+3;
-        model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
+        currentState = ENTER_MAZE;
+        isAnimating = 1;
         maze_location.x = 0;
         maze_location.y = width;
     }
@@ -1291,16 +1288,33 @@ void idle(void)
 
         else if(currentState == ENTER_MAZE)
         {
-            // float alpha;
-            // if(current_step == max_steps)
-            // {
-            //     vec4 change_eye = (vec4){length*4-.1, len+5, maxX-maxX/2, 1};
-            //     vec4 change_look = (vec4){0,0,len+5,1};
-            //     vec4 move_eye = vec_add(change_eye, eye);
-            //     vec4 move_look = vec_add(change_look, look);
-            //     model_view = look_at(move_eye.x, move_eye.y, move_eye.z, move_look.x, move_look.y, move_look.z, 0,1,0);
+            float alpha;
+            if(current_step == max_steps)
+            {
+                current_step = 0;
+                isAnimating = 0;
+                eye.x = width*4-1;
+                eye.y = wid+4.1;
+                eye.z = width*4.2;
+                
+                look.z = wid+4.1;
+                model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
+            }
 
-            // }
+            else
+            {
+                alpha = (float)current_step/max_steps;
+                vec4 target = (vec4){width*4-1, wid+4.1, width*4.5, 1};
+                vec4 change_eye = vec_sub(eye, target);
+                print_v4(change_eye);
+                change_eye.x = -change_eye.x*alpha;
+                change_eye.y = -change_eye.y*alpha;
+                change_eye.z = -change_eye.z*alpha;
+                change_eye = vec_add(change_eye, eye);
+                vec4 move_look = (vec4){0,0,(wid+4.1)*alpha,1};
+                move_look = vec_add(move_look,look);
+                model_view = look_at(change_eye.x, change_eye.y, change_eye.z, move_look.x, move_look.y, move_look.z, 0,1,0);
+            }
         }
 
         else if(currentState == WALK_FORWARD)
@@ -1345,7 +1359,7 @@ void idle(void)
             else
             {
                 alpha = (float)current_step/max_steps;
-                vec4 change = (vec4){0,0,6*alpha, 1};
+                vec4 change = (vec4){0,0,8*alpha, 1};
                 vec4 move = vec_add(change,eye);
                 model_view = look_at(move.x, move.y, move.z, look.x, look.y, look.z, 0,1,0);
             }
