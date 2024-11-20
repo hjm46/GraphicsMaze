@@ -51,7 +51,7 @@ int last_for_maze = 0;
 vec4 eye = {0,0,0,0}; GLuint eye_location;
 vec4 look = {0,0,0,0};
 // light
-vec4 light = {0,0,0,0}; GLuint light_location;
+vec4 light = {0,0,0,0}; GLuint light_location; int light_ind = 1; GLuint light_ind_location;
 GLuint shine_location; float shininess = 50;
 GLuint attenuation_a_loc, attenuation_b_loc, attenuation_c_loc;
 float attenuation_a = 0.0; float attenuation_b = 0.0, attenuation_c = 1;
@@ -961,6 +961,7 @@ void init(void)
     attenuation_a_loc = glGetUniformLocation(program, "attenuation_constant");
     attenuation_b_loc = glGetUniformLocation(program, "attenuation_linear");
     attenuation_c_loc = glGetUniformLocation(program, "attenuation_quadratic");
+    light_ind_location = glGetUniformLocation(program, "light_ind");
 
     GLuint texture_location = glGetUniformLocation(program, "texture");
     glUniform1i(texture_location, 0);
@@ -985,6 +986,7 @@ void display(void)
     glUniform1fv(attenuation_a_loc, 1, (GLvoid*) &attenuation_a);
     glUniform1fv(attenuation_b_loc, 1, (GLvoid*) &attenuation_b);
     glUniform1fv(attenuation_c_loc, 1, (GLvoid*) &attenuation_c);
+    glUniform1iv(light_ind_location, 1, (GLvoid*) &light_ind);
 
     glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 
@@ -1185,7 +1187,14 @@ void keyboard(unsigned char key, int mousex, int mousey)
         shininess+=1;
         //printf("%f\n", shininess);
     }
-
+    // turn light on
+    if(key == 'l') {
+        light_ind = 1;
+    }
+    // turn light off
+    if(key == 'o') {
+        light_ind = 0;
+    }
     // move sun
     // north
     if(key == '1') {

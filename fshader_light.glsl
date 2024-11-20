@@ -9,11 +9,13 @@ varying vec2 texCoord;
 uniform sampler2D texture;
 uniform float shininess;
 uniform float attenuation_constant, attenuation_linear, attenuation_quadratic;
+uniform int light_ind;
 
 vec4 ambient, diffuse, specular;
 
 void main()
 {
+	if(light_ind == 1) {
 		vec4 color = texture2D(texture, texCoord);
 		vec4 NN = normalize(N);
 		vec4 VV = normalize(V);
@@ -25,4 +27,9 @@ void main()
 		specular = pow(max(dot(NN, H), 0.0), shininess) * vec4(1.0, 1.0, 1.0, 1.0);
 		float attenuation = 1/(attenuation_constant + (attenuation_linear * distance) + (attenuation_quadratic * distance * distance));
 		gl_FragColor = ambient + attenuation * (diffuse + specular);
+	}
+	else {
+		gl_FragColor = texture2D(texture, texCoord);
+	}
+		
 }
