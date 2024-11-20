@@ -55,6 +55,9 @@ vec4 light = {0,0,0,0}; GLuint light_location;
 GLuint shine_location; float shininess = 50;
 GLuint attenuation_a_loc, attenuation_b_loc, attenuation_c_loc;
 float attenuation_a = 0.0; float attenuation_b = 0.0, attenuation_c = 1;
+mat4 sun_ctm = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
+vec4 *sun_positions;
+vec2 *sun_tex_coords;
 
 typedef enum
 {
@@ -710,6 +713,7 @@ void init(void)
 
     vec4 *positions = (vec4 *) malloc(sizeof(vec4) * num_vertices);
     vec4* normal_array = (vec4 *) malloc(sizeof(vec4) * num_vertices);
+    sun_positions = (vec4 *) malloc(sizeof(vec4) * 36);
 
     // creating one cube
     positions[0] = (vec4) { 1.0,  1.0, 1.0, 1.0};
@@ -1178,6 +1182,25 @@ void keyboard(unsigned char key, int mousex, int mousey)
         shininess+=1;
         //printf("%f\n", shininess);
     }
+
+    // move sun
+    // north
+    if(key == '1') {
+        
+    }
+    // south
+    if(key == '2') {
+        
+    }
+    // east (sunrise)
+    if(key == '3') {
+        
+    }
+    // west (sunset)
+    if(key == '4') {
+        
+    }
+
     glutPostRedisplay();
 }
 
