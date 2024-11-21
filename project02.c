@@ -57,8 +57,6 @@ GLuint attenuation_a_loc, attenuation_b_loc, attenuation_c_loc;
 float attenuation_a = 0.0; float attenuation_b = 0.0, attenuation_c = 1;
 mat4 rotation_matrix;
 mat4 sun_ctm = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
-vec4 *sun_positions;
-vec2 *sun_tex_coords;
 
 typedef enum
 {
@@ -714,7 +712,6 @@ void init(void)
 
     vec4 *positions = (vec4 *) malloc(sizeof(vec4) * num_vertices);
     vec4* normal_array = (vec4 *) malloc(sizeof(vec4) * num_vertices);
-    sun_positions = (vec4 *) malloc(sizeof(vec4) * 36);
 
     // creating one cube
     positions[0] = (vec4) { 1.0,  1.0, 1.0, 1.0};
@@ -988,7 +985,10 @@ void display(void)
     glUniform1fv(attenuation_c_loc, 1, (GLvoid*) &attenuation_c);
     glUniform1iv(light_ind_location, 1, (GLvoid*) &light_ind);
 
-    glDrawArrays(GL_TRIANGLES, 0, num_vertices);
+    glDrawArrays(GL_TRIANGLES, 0, num_vertices-36);
+
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &sun_ctm);
+    glDrawArrays(GL_TRIANGLES, num_vertices-36, 36);
 
     glutSwapBuffers();
 }
@@ -1198,19 +1198,19 @@ void keyboard(unsigned char key, int mousex, int mousey)
     // move sun
     // north
     if(key == '1') {
-        
+        sun_ctm = mat_mult(x_rotate(-5), sun_ctm);
     }
     // south
     if(key == '2') {
-        
+        sun_ctm = mat_mult(x_rotate(5), sun_ctm);
     }
     // east (sunrise)
     if(key == '3') {
-        
+        sun_ctm = mat_mult(z_rotate(-5), sun_ctm);
     }
     // west (sunset)
     if(key == '4') {
-        
+        sun_ctm = mat_mult(z_rotate(5), sun_ctm);
     }
 
     glutPostRedisplay();
@@ -1301,6 +1301,7 @@ void motion(int x, int y)
 
     rotation_matrix = mat_mult(transpose_r_x, mat_mult(transpose_r_y, mat_mult(r_z, mat_mult(r_y, r_x))));
     curr_trans_matrix = mat_mult(rotation_matrix, curr_trans_matrix);
+    sun_ctm = mat_mult(curr_trans_matrix, m4_identity());
 
    //print_m4(curr_trans_matrix);
 
