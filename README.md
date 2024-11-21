@@ -28,6 +28,7 @@ u: turn specular light off\
 
 m: go to maze entrance\
 c: solve with shortest path\
+v: solve with left-hand rule\
 space: return to inital view
 
 1: move sun north\
@@ -37,6 +38,5 @@ space: return to inital view
 
 #### still need to do?
 - animation for back to original view
-- automatically solve (left-hand rule)
 - types of light (on & off)
 - flashlight
