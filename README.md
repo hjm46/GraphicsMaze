@@ -4,7 +4,7 @@
 Jace Martin, Daisy Chen, Emma Chau
 
 #### Keys:
-q: quit\
+q: quit
 
 w: walk forward\
 a: slide left\
