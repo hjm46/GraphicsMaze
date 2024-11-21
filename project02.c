@@ -115,6 +115,7 @@ post** maze_struct;
 int isShortSolve = 0;
 cell* path;
 int path_index = 0;
+int isLeftSolve = -1;
 
 // textures
 void first_row_ground_tex(vec2* tex_coords, int start, int vertices){
@@ -1165,6 +1166,11 @@ void keyboard(unsigned char key, int mousex, int mousey)
         isShortSolve = 2;
     }
 
+    if(key == 'l')
+    {
+        isLeftSolve = 2;
+    }
+
     // zoom out
     if(key == '-') {
         //projection = mat_mult(projection, translate(0,0,-5));
@@ -1399,6 +1405,8 @@ void idle(void)
                 eye.z = eye.z-8;
                 if(isShortSolve == 1)
                     isShortSolve = 2;
+                if(isLeftSolve == 1)
+                    isLeftSolve = 2;
             }
 
             else
@@ -1423,6 +1431,8 @@ void idle(void)
                 eye.z = eye.z+8;
                 if(isShortSolve == 1)
                     isShortSolve = 2;
+                if(isLeftSolve == 1)
+                    isLeftSolve = 2;
             }
 
             else
@@ -1447,6 +1457,8 @@ void idle(void)
                 eye.x = eye.x-8;
                 if(isShortSolve == 1)
                     isShortSolve = 2;
+                if(isLeftSolve == 1)
+                    isLeftSolve = 2;
             }
 
             else
@@ -1471,6 +1483,8 @@ void idle(void)
                 eye.x = eye.x+8;
                 if(isShortSolve == 1)
                     isShortSolve = 2;
+                if(isLeftSolve == 1)
+                    isLeftSolve = 2;
             }
 
             else
@@ -1507,6 +1521,10 @@ void idle(void)
                 look = move;
                 if(isShortSolve == 1)
                     isShortSolve = 2;
+                if(isLeftSolve == 1)
+                    isLeftSolve = 3;
+                else if(isLeftSolve == 0)
+                    isLeftSolve = 2;
             }
 
             else
@@ -1736,6 +1754,260 @@ void idle(void)
                 current_direction = WEST;
                 isShortSolve = 1;
             }
+        }
+    }
+
+    if(isLeftSolve == 2)
+    {
+        // printf("\n\nlocation: %d, %d\n\n", maze_location.x, maze_location.y);
+        if(maze_location.x == length && maze_location.y == 0)
+        {
+            if(current_direction == WEST)
+            {
+                currentState = TURN_RIGHT;
+                isAnimating = 1;
+                current_direction = NORTH;
+                isLeftSolve = -1;
+            }
+
+            else if(current_direction == EAST)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = NORTH;
+                isLeftSolve = -1;
+            }
+
+            // printf("finished\n");
+            isLeftSolve = -1;
+        }
+
+        else if(current_direction == NORTH)
+        {
+            // printf("why\n")
+            // printf("%d, %d\n", maze_location.x, maze_location.y);
+            bool left = collision(maze_location.x, maze_location.y, 3, maze_struct);
+            bool forward = collision(maze_location.x, maze_location.y, 0, maze_struct);
+            bool right = collision(maze_location.x, maze_location.y, 2, maze_struct);
+            bool backward = collision(maze_location.x, maze_location.y, 1, maze_struct);
+            // printf("\n 1 n: %d, s: %d, e: %d, w: %d\n", forward, backward, left, right);
+            // printf("location: %d, %d\n\n", maze_location.x, maze_location.y);
+
+            if(maze_location.x == 0 && maze_location.y == width)
+            {
+                right = 1;
+                backward = 1;
+            }
+
+            if(left == false)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = WEST;
+                isLeftSolve = 1;
+            }
+
+            else if(forward == false)
+            {
+                isLeftSolve = 3;
+            }
+
+            else if(right == false)
+            {
+                current_direction = EAST;
+                currentState = TURN_RIGHT;
+                isLeftSolve = 1;
+                isAnimating = 1;
+            }
+
+            else
+            {
+                current_direction = WEST;
+                isAnimating = 1;
+                currentState = TURN_LEFT;
+                isLeftSolve = 0;
+            }
+        }
+
+        else if(current_direction == SOUTH)
+        {
+            // printf("south ");
+            // printf("%d, %d\n", maze_location.x, maze_location.y);
+            bool left = collision(maze_location.x, maze_location.y, 2, maze_struct);
+            bool forward = collision(maze_location.x, maze_location.y, 1, maze_struct);
+            bool right = collision(maze_location.x, maze_location.y, 3, maze_struct);
+            bool backward = collision(maze_location.x, maze_location.y, 0, maze_struct);
+            // printf("\n 2 n: %d, s: %d, e: %d, w: %d\n", forward, backward, left, right);
+            // printf("location: %d, %d\n\n", maze_location.x, maze_location.y);
+
+            if(maze_location.x == 0 && maze_location.y == width)
+            {
+                left = 1;
+                forward = 1;
+            }
+
+            if(left == false)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = EAST;
+                isLeftSolve = 1;
+            }
+
+            else if(forward == false)
+            {
+                isLeftSolve = 3;
+            }
+
+            else if(right == false)
+            {
+                isLeftSolve = 1;
+                current_direction = WEST;
+                currentState = TURN_RIGHT;
+                isAnimating = 1;
+            }
+
+            else
+            {
+                current_direction = EAST;
+                isAnimating = 1;
+                currentState = TURN_LEFT;
+                isLeftSolve = 0;
+            }
+        }
+
+        else if(current_direction == EAST)
+        {
+            // printf("east ");
+            // printf("%d, %d\n", maze_location.x, maze_location.y);
+            bool left = collision(maze_location.x, maze_location.y, 0, maze_struct);
+            bool forward = collision(maze_location.x, maze_location.y, 2, maze_struct);
+            bool right = collision(maze_location.x, maze_location.y, 1, maze_struct);
+            bool backward = collision(maze_location.x, maze_location.y, 3, maze_struct);
+            // printf("\n 3 n: %d, s: %d, e: %d, w: %d\n", forward, backward, left, right);
+            // printf("location: %d, %d\n\n", maze_location.x, maze_location.y);
+
+            if(maze_location.x == 0 && maze_location.y == width)
+            {
+                forward = 1;
+                right = 1;
+            }
+
+            if(left == false)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = NORTH;
+                isLeftSolve = 1;
+            }
+
+            else if(forward == false)
+            {
+                currentState = TURN_RIGHT;
+                isLeftSolve = 3;
+            }
+
+            else if(right == false)
+            {
+                isLeftSolve = 1;
+                current_direction = SOUTH;
+                currentState = TURN_RIGHT;
+                isAnimating = 1;
+            }
+
+            else
+            {
+                current_direction = NORTH;
+                isAnimating = 1;
+                currentState = TURN_LEFT;
+                isLeftSolve = 0;
+            }
+        }
+
+        else if(current_direction == WEST)
+        {
+            // printf("west ");
+            // printf("%d, %d\n", maze_location.x, maze_location.y);
+            bool left = collision(maze_location.x, maze_location.y, 1, maze_struct);
+            bool forward = collision(maze_location.x, maze_location.y, 3, maze_struct);
+            bool right = collision(maze_location.x, maze_location.y, 0, maze_struct);
+            bool backward = collision(maze_location.x, maze_location.y, 2, maze_struct);
+            // printf("\n 4 n: %d, s: %d, e: %d, w: %d\n", forward, backward, left, right);
+            // printf("location: %d, %d\n\n", maze_location.x, maze_location.y);
+
+            if(maze_location.x == 0 && maze_location.y == width)
+            {
+                left = 1;
+                backward = 1;
+            }
+
+            if(left == false)
+            {
+                currentState = TURN_LEFT;
+                isAnimating = 1;
+                current_direction = SOUTH;
+                isLeftSolve = 1;
+            }
+
+            else if(forward == false)
+            {
+                isLeftSolve = 3;
+            }
+
+            else if(right == false)
+            {
+                isLeftSolve = 1;
+                current_direction = NORTH;
+                currentState = TURN_RIGHT;
+                isAnimating = 1;
+            }
+
+            else
+            {
+                current_direction = SOUTH;
+                isAnimating = 1;
+                currentState = TURN_LEFT;
+                isLeftSolve = 0;
+            }
+        }
+    }
+
+    if(isLeftSolve == 3)
+    {
+        if(current_direction == NORTH)
+        {
+            // printf("walk north\n");
+            currentState = WALK_FORWARD;
+            isAnimating = 1;
+            isLeftSolve = 1;
+            maze_location.x+=1;
+        }
+
+        else if(current_direction == SOUTH)
+        {
+            // printf("walk south\n");
+            currentState = WALK_BACKWARD;
+            isAnimating = 1;
+            isLeftSolve = 1;
+            maze_location.x-=1;
+        }
+
+        else if(current_direction == EAST)
+        {
+            // printf("walk east\n");
+            currentState = SLIDE_RIGHT;
+            isAnimating = 1;
+            isLeftSolve = 1;
+            maze_location.y+=1;
+        }
+
+        else if(current_direction == WEST)
+        {
+            // printf("walk west\n");
+            currentState = SLIDE_LEFT;
+            isAnimating = 1;
+            isLeftSolve = 1;
+            maze_location.y-=1;
         }
     }
 }
