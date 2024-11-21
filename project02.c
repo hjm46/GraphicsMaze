@@ -52,6 +52,9 @@ vec4 eye = {0,0,0,0}; GLuint eye_location;
 vec4 look = {0,0,0,0};
 // light
 vec4 light = {0,0,0,0}; GLuint light_location; int light_ind = 1; GLuint light_ind_location;
+int amb_ind = 2; GLuint amb_ind_location;
+int diff_ind = 2; GLuint diff_ind_location;
+int spec_ind = 2; GLuint spec_ind_location;
 GLuint shine_location; float shininess = 50;
 GLuint attenuation_a_loc, attenuation_b_loc, attenuation_c_loc;
 float attenuation_a = 0.0; float attenuation_b = 0.0, attenuation_c = 1;
@@ -959,6 +962,9 @@ void init(void)
     attenuation_b_loc = glGetUniformLocation(program, "attenuation_linear");
     attenuation_c_loc = glGetUniformLocation(program, "attenuation_quadratic");
     light_ind_location = glGetUniformLocation(program, "light_ind");
+    amb_ind_location = glGetUniformLocation(program, "amb_ind");
+    diff_ind_location = glGetUniformLocation(program, "diff_ind");
+    spec_ind_location = glGetUniformLocation(program, "spec_ind");
 
     GLuint texture_location = glGetUniformLocation(program, "texture");
     glUniform1i(texture_location, 0);
@@ -984,6 +990,9 @@ void display(void)
     glUniform1fv(attenuation_b_loc, 1, (GLvoid*) &attenuation_b);
     glUniform1fv(attenuation_c_loc, 1, (GLvoid*) &attenuation_c);
     glUniform1iv(light_ind_location, 1, (GLvoid*) &light_ind);
+    glUniform1iv(amb_ind_location, 1, (GLvoid*) &amb_ind);
+    glUniform1iv(diff_ind_location, 1, (GLvoid*) &diff_ind);
+    glUniform1iv(spec_ind_location, 1, (GLvoid*) &spec_ind);
 
     glDrawArrays(GL_TRIANGLES, 0, num_vertices-36);
 
@@ -1183,7 +1192,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
         //printf("%f\n", shininess);
     } 
     // decrease shininess
-    if(key == 'u') {
+    if(key == 'p') {
         shininess+=1;
         //printf("%f\n", shininess);
     }
@@ -1194,6 +1203,30 @@ void keyboard(unsigned char key, int mousex, int mousey)
     // turn light off
     if(key == 'o') {
         light_ind = 0;
+    }
+        // turn ambient light off
+    if(key == 't') {
+        amb_ind = 0;
+    }
+    // turn diffuse light off
+    if(key == 'y') {
+        diff_ind = 0;
+    }
+    // turn specular light off
+    if(key == 'u') {
+        spec_ind = 0;
+    }
+    // turn ambient light on
+    if(key == '5') {
+        amb_ind = 1;
+    }
+    // turn diffuse light on
+    if(key == '6') {
+        diff_ind = 1;
+    }
+    // turn specular light on
+    if(key == '7') {
+        spec_ind = 1;
     }
     // move sun
     // north
