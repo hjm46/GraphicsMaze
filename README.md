@@ -17,14 +17,14 @@ k: look right
 +: zoom in
 
 o: turn light off\
-l: turn light on\
+l: turn light on
 
 t: turn ambient light off\
 y: turn diffuse light off\
 u: turn specular light off\
 4: turn ambient light on\
 5: turn diffuse light on\
-6: turn specular light on\
+6: turn specular light on
 
 m: go to maze entrance\
 c: solve with shortest path\
