@@ -1166,7 +1166,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
         isShortSolve = 2;
     }
 
-    if(key == 'l')
+    if(key == 'v')
     {
         isLeftSolve = 2;
     }
