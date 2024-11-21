@@ -953,10 +953,8 @@ void init(void)
     model_view_location = glGetUniformLocation(program, "model_view");
     projection_location = glGetUniformLocation(program, "projection");
     
-    GLuint eye_location = glGetUniformLocation(program, "eye_point");
-    glUniform4fv(eye_location, 1, (GLvoid*) &eye);
-    GLuint light_location = glGetUniformLocation(program, "light_position");
-    glUniform4fv(light_location, 1, (GLvoid*) &light);
+    eye_location = glGetUniformLocation(program, "eye_point");
+    light_location = glGetUniformLocation(program, "light_position");
 
     shine_location = glGetUniformLocation(program, "shininess");
     attenuation_a_loc = glGetUniformLocation(program, "attenuation_constant");
@@ -985,6 +983,8 @@ void display(void)
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &curr_trans_matrix);
     glUniformMatrix4fv(model_view_location, 1, GL_FALSE, (GLfloat *) &model_view);
     glUniformMatrix4fv(projection_location, 1, GL_FALSE, (GLfloat *) &projection);
+    glUniform4fv(light_location, 1, (GLvoid *) &light);
+    glUniform4fv(eye_location, 1, (GLvoid*) &eye);
     
     glUniform1fv(shine_location, 1, (GLvoid*) &shininess);
     glUniform1fv(attenuation_a_loc, 1, (GLvoid*) &attenuation_a);
@@ -1238,18 +1238,22 @@ void keyboard(unsigned char key, int mousex, int mousey)
     // north
     if(key == '1') {
         sun_ctm = mat_mult(x_rotate(-5), sun_ctm);
+        light = mat_vec_mult(x_rotate(-5), light);
     }
     // south
     if(key == '2') {
         sun_ctm = mat_mult(x_rotate(5), sun_ctm);
+        light = mat_vec_mult(x_rotate(5), light);
     }
     // east (sunrise)
     if(key == '3') {
         sun_ctm = mat_mult(z_rotate(-5), sun_ctm);
+        light = mat_vec_mult(z_rotate(-5), light);
     }
     // west (sunset)
     if(key == '4') {
         sun_ctm = mat_mult(z_rotate(5), sun_ctm);
+        light = mat_vec_mult(z_rotate(5), light);
     }
 
     glutPostRedisplay();
