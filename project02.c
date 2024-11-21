@@ -1512,7 +1512,7 @@ void idle(void)
                 change = mat_add(m4_identity(), rotation_matrix);
                 change = inverse(change);
                 curr_trans_matrix = mat_add(change, curr_trans_matrix);
-
+                sun_ctm = mat_add(change, sun_ctm);
             }
         }
 
