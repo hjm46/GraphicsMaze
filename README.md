@@ -23,6 +23,5 @@ space: return to inital view
 #### still need to do?
 - animation for back to original view
 - automatically solve (left-hand rule)
-- move sun
 - types of light (on & off)
 - flashlight
