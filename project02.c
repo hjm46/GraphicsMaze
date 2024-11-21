@@ -1537,15 +1537,31 @@ void idle(void)
                 current_step = 0;
                 isAnimating = 0;
                 curr_trans_matrix = m4_identity();
+                sun_ctm = m4_identity();
+                eye = (vec4){0,0,maxX+10,0};
+                model_view = look_at(eye.x,eye.y,eye.z, 0, 0, 1, 0, 1, 0);
             }
 
             else {
                 alpha = (float)current_step/max_steps;
-                mat4 change = scalar_mat_mult(alpha, change);
-                change = mat_add(m4_identity(), rotation_matrix);
-                change = inverse(change);
-                curr_trans_matrix = mat_add(change, curr_trans_matrix);
-                sun_ctm = mat_add(change, sun_ctm);
+                mat4 alpha_m = scalar_mat_mult(alpha, curr_trans_matrix);
+                mat4 change_ctm = mat_add(alpha_m, rotation_matrix);
+                change_ctm = inverse(change_ctm);
+                curr_trans_matrix = mat_mult(change_ctm, curr_trans_matrix);
+                sun_ctm = mat_add(z_rotate(alpha), sun_ctm);
+
+                // change eye and model view
+                vec4 target = (vec4){0,0,maxX+10,1};
+                vec4 change_eye = vec_sub(eye, target);
+                print_v4(change_eye);
+                change_eye.x = -change_eye.x*alpha;
+                change_eye.y = -change_eye.y*alpha;
+                change_eye.z = -change_eye.z*alpha;
+                change_eye = vec_add(change_eye, eye);
+                vec4 move_look = (vec4){0,0,1,1};
+                move_look = vec_add(move_look,look);
+                model_view = look_at(change_eye.x, change_eye.y, change_eye.z, move_look.x, move_look.y, move_look.z, 0,1,0);
+                change_eye = eye;
             }
         }
 
