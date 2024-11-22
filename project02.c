@@ -1020,25 +1020,25 @@ void keyboard(unsigned char key, int mousex, int mousey)
     // foward
     if(key == 'w') {
         // printf("%d, %d, direction: %d\n", maze_location.x, maze_location.y, current_direction);
-        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 0, maze_struct) == false)
+        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 0, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = WALK_FORWARD;
             maze_location.x+=1;
         }
-        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 1, maze_struct) == false)
+        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 1, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = WALK_BACKWARD;
             maze_location.x-=1;
         }
-        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 2, maze_struct) == false)
+        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 2, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = SLIDE_RIGHT;
             maze_location.y+=1;
         }
-        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 3, maze_struct) == false)
+        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 3, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = SLIDE_LEFT;
@@ -1048,25 +1048,25 @@ void keyboard(unsigned char key, int mousex, int mousey)
 
     // slide left
     if(key == 'a') {
-        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 3, maze_struct) == false)
+        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 3, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = SLIDE_LEFT;
             maze_location.y-=1;
         }
-        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 2, maze_struct) == false)
+        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 2, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = SLIDE_RIGHT;
             maze_location.y+=1;
         }
-        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 0, maze_struct) == false)
+        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 0, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = WALK_FORWARD;
             maze_location.x+=1;
         }
-        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 1, maze_struct) == false)
+        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 1, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = WALK_BACKWARD;
@@ -1076,25 +1076,25 @@ void keyboard(unsigned char key, int mousex, int mousey)
 
     // backward
     if(key == 's') {
-        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 1, maze_struct) == false)
+        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 1, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = WALK_BACKWARD;
             maze_location.x-=1;
         }
-        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 0, maze_struct) == false)
+        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 0, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = WALK_FORWARD;
             maze_location.x+=1;
         }
-        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 3, maze_struct) == false)
+        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 3, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = SLIDE_LEFT;
             maze_location.y-=1;
         }
-        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 2, maze_struct) == false)
+        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 2, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = SLIDE_RIGHT;
@@ -1104,25 +1104,25 @@ void keyboard(unsigned char key, int mousex, int mousey)
 
     // slide right
     if(key == 'd') {
-        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 2, maze_struct) == false)
+        if(current_direction == NORTH && collision(maze_location.x, maze_location.y, 2, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = SLIDE_RIGHT;
             maze_location.y+=1;
         }
-        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 3, maze_struct) == false)
+        else if(current_direction == SOUTH && collision(maze_location.x, maze_location.y, 3, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = SLIDE_LEFT;
             maze_location.y-=1;
         }
-        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 1, maze_struct) == false)
+        else if(current_direction == EAST && collision(maze_location.x, maze_location.y, 1, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = WALK_BACKWARD;
             maze_location.x-=1;
         }
-        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 0, maze_struct) == false)
+        else if(current_direction == WEST && collision(maze_location.x, maze_location.y, 0, maze_struct) == false && isAnimating == 0)
         {
             isAnimating = 1;
             currentState = WALK_FORWARD;
@@ -1132,32 +1132,38 @@ void keyboard(unsigned char key, int mousex, int mousey)
 
     // look right
     if(key == 'k') {
-        if(current_direction == NORTH)
-            current_direction = EAST;
-        else if(current_direction == EAST)
-            current_direction = SOUTH;
-        else if(current_direction == SOUTH)
-            current_direction = WEST;
-        else if(current_direction == WEST)
-            current_direction = NORTH;
-        
-        isAnimating = 1;
-        currentState = TURN_RIGHT;
+        if(isAnimating == 0)
+        {
+            if(current_direction == NORTH)
+                current_direction = EAST;
+            else if(current_direction == EAST)
+                current_direction = SOUTH;
+            else if(current_direction == SOUTH)
+                current_direction = WEST;
+            else if(current_direction == WEST)
+                current_direction = NORTH;
+            
+            isAnimating = 1;
+            currentState = TURN_RIGHT;
+        }
     }
 
     // look left
     if(key == 'j') {
-        if(current_direction == NORTH)
-            current_direction = WEST;
-        else if(current_direction == WEST)
-            current_direction = SOUTH;
-        else if(current_direction == SOUTH)
-            current_direction = EAST;
-        else if(current_direction == EAST)
-            current_direction = NORTH;
+        if(isAnimating == 0)
+        {
+            if(current_direction == NORTH)
+                current_direction = WEST;
+            else if(current_direction == WEST)
+                current_direction = SOUTH;
+            else if(current_direction == SOUTH)
+                current_direction = EAST;
+            else if(current_direction == EAST)
+                current_direction = NORTH;
 
-        isAnimating = 1;
-        currentState = TURN_LEFT;
+            isAnimating = 1;
+            currentState = TURN_LEFT;
+        }
     }
 
     // solve with shortest path
@@ -1166,6 +1172,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
         isShortSolve = 2;
     }
 
+    // solve with left-hand rule
     if(key == 'v')
     {
         isLeftSolve = 2;
