@@ -51,15 +51,16 @@ int last_for_maze = 0;
 vec4 eye = {0,0,0,0}; GLuint eye_location;
 vec4 look = {0,0,0,0};
 // light
-vec4 light_og_pos = {0,0,0,0}; vec4 light = {0,0,0,0}; GLuint light_location; int light_ind = 1; GLuint light_ind_location;
-int amb_ind = 2; GLuint amb_ind_location;
-int diff_ind = 2; GLuint diff_ind_location;
-int spec_ind = 2; GLuint spec_ind_location;
-GLuint shine_location; float shininess = 50;
+vec4 light_og_pos = {0,0,0,0}; vec4 light = {0,0,0,0}; GLuint light_location; int light_ind = 0; GLuint light_ind_location;
+int amb_ind = 0; GLuint amb_ind_location;
+int diff_ind = 0; GLuint diff_ind_location;
+int spec_ind = 0; GLuint spec_ind_location;
+GLuint shine_location; float shininess = 700;
 GLuint attenuation_a_loc, attenuation_b_loc, attenuation_c_loc;
 float attenuation_a = 0.0; float attenuation_b = 0.0, attenuation_c = 1;
 mat4 rotation_matrix;
 mat4 sun_ctm = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
+int spot_ind = 0; GLuint spot_ind_location;
 
 typedef enum
 {
@@ -964,6 +965,7 @@ void init(void)
     amb_ind_location = glGetUniformLocation(program, "amb_ind");
     diff_ind_location = glGetUniformLocation(program, "diff_ind");
     spec_ind_location = glGetUniformLocation(program, "spec_ind");
+    spot_ind_location = glGetUniformLocation(program, "spot_ind");
 
     GLuint texture_location = glGetUniformLocation(program, "texture");
     glUniform1i(texture_location, 0);
@@ -994,6 +996,7 @@ void display(void)
     glUniform1iv(amb_ind_location, 1, (GLvoid*) &amb_ind);
     glUniform1iv(diff_ind_location, 1, (GLvoid*) &diff_ind);
     glUniform1iv(spec_ind_location, 1, (GLvoid*) &spec_ind);
+    glUniform1iv(spot_ind_location, 1, (GLvoid*) &spot_ind);
 
     glDrawArrays(GL_TRIANGLES, 0, num_vertices-36);
 
@@ -1210,38 +1213,31 @@ void keyboard(unsigned char key, int mousex, int mousey)
         shininess+=1;
         //printf("%f\n", shininess);
     }
-    // turn light on
+    // turn light on/off
     if(key == 'l') {
-        light_ind = 1;
+        light_ind += 1;
     }
-    // turn light off
-    if(key == 'o') {
-        light_ind = 0;
-    }
-        // turn ambient light off
+    // turn ambient light on/off
     if(key == 't') {
-        amb_ind = 0;
+        amb_ind += 1;
     }
-    // turn diffuse light off
+    // turn diffuse light on/off
     if(key == 'y') {
-        diff_ind = 0;
+        diff_ind += 1;
     }
-    // turn specular light off
+    // turn specular light on/ff
     if(key == 'u') {
-        spec_ind = 0;
+        spec_ind += 1;
     }
-    // turn ambient light on
-    if(key == '5') {
-        amb_ind = 1;
-    }
-    // turn diffuse light on
-    if(key == '6') {
-        diff_ind = 1;
-    }
-    // turn specular light on
-    if(key == '7') {
+
+    // toggle spotlight
+    if(key == 'f') {
+        spot_ind += 1;
+        diff_ind = 0;
+        amb_ind = 0;
         spec_ind = 1;
     }
+    
     // move sun
     // north
     if(key == '1') {
@@ -1277,6 +1273,11 @@ void mouse(int button, int state, int x, int y)
             z_coor = sqrt(1.0 - (x_coor * x_coor + y_coor * y_coor));
         else
             return;
+    }
+    // move flashlight 
+    if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+    {
+       
     }
 
     glutPostRedisplay();
@@ -1352,7 +1353,7 @@ void motion(int x, int y)
 
     rotation_matrix = mat_mult(transpose_r_x, mat_mult(transpose_r_y, mat_mult(r_z, mat_mult(r_y, r_x))));
     curr_trans_matrix = mat_mult(rotation_matrix, curr_trans_matrix);
-    sun_ctm = mat_mult(curr_trans_matrix, m4_identity());
+    sun_ctm = mat_mult(rotation_matrix, sun_ctm);
 
    //print_m4(curr_trans_matrix);
 
@@ -1393,7 +1394,7 @@ void idle(void)
                 alpha = (float)current_step/max_steps;
                 vec4 target = (vec4){width*4-1, wid+4.1, length*4.3, 1};
                 vec4 change_eye = vec_sub(eye, target);
-                print_v4(change_eye);
+                // print_v4(change_eye);
                 change_eye.x = -change_eye.x*alpha;
                 change_eye.y = -change_eye.y*alpha;
                 change_eye.z = -change_eye.z*alpha;
