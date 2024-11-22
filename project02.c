@@ -1015,6 +1015,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
         isAnimating = 1;
         maze_location.x = 0;
         maze_location.y = width;
+        printf("location: %d, %d\n", maze_location.x, maze_location.y);
     }
 
     // foward
@@ -1381,7 +1382,7 @@ void idle(void)
                 isAnimating = 0;
                 eye.x = width*4-1;
                 eye.y = wid+4.1;
-                eye.z = width*4.2;
+                eye.z = length*4.3;
                 
                 look.z = wid+4.1;
                 model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
@@ -1390,7 +1391,7 @@ void idle(void)
             else
             {
                 alpha = (float)current_step/max_steps;
-                vec4 target = (vec4){width*4-1, wid+4.1, width*4.5, 1};
+                vec4 target = (vec4){width*4-1, wid+4.1, length*4.3, 1};
                 vec4 change_eye = vec_sub(eye, target);
                 print_v4(change_eye);
                 change_eye.x = -change_eye.x*alpha;
