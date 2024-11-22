@@ -20,6 +20,7 @@ l: toggle light on\
 t: toggle ambient light off\
 y: toggle diffuse light off\
 u: toggle specular light off\
+f: toggle flashlight
 
 m: go to maze entrance\
 c: solve with shortest path\
