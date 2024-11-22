@@ -1577,11 +1577,10 @@ void idle(void)
             else {
                 alpha = (float)current_step/max_steps;
                 // change ctm
-                // still not quite right, maybe don't use rotation_matrix??
-                mat4 alpha_m = scalar_mat_mult(alpha, curr_trans_matrix);
-                mat4 change_ctm = mat_add(alpha_m, rotation_matrix);
-                change_ctm = inverse(change_ctm);
-                curr_trans_matrix = mat_mult(change_ctm, curr_trans_matrix);
+                mat4 change_ctm = mat_sub(m4_identity(), curr_trans_matrix);
+                change_ctm = scalar_mat_mult(alpha, change_ctm);
+                curr_trans_matrix = mat_add(curr_trans_matrix, change_ctm);
+    
                 // change sun_ctm
                 sun_ctm = mat_add(z_rotate(alpha), sun_ctm);
 
