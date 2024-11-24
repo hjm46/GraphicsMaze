@@ -2044,7 +2044,18 @@ int main(int argc, char **argv)
     scanf("%d", &length);
     printf("Enter width: ");
     scanf("%d", &width);
-    //printf("%d", width);
+    printf("\nKEY COMMANDS\n");
+    printf("-: zoom out\n+: zoom in\nspace: return to initial view\nq: quit\n");
+    printf("\nLIGHT\n");
+    printf("l: toggle light on/off\nt: toggle ambient light on/off\n");
+    printf("y: toggle diffuse light on/off\nu: toggle spectular light on/off\nf: toggle flashlight on/off\n");
+    printf("\nMOVING THE SUN\n");
+    printf("1: move sun north\n2: move sun south\n3: move sun east\n4: move sun west\n");
+    printf("\nWALKING IN THE MAZE\n");
+    printf("m: go to maze entrance\n");
+    printf("w: walk forward\ns: walk backward\na: slide left\nd: slide right\nj: look left\nk: look right\n");
+    printf("c: solve maze with shortest path\nv: solve maze with left-hand rule\n\n");
+    printf("MAZE\n");
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
