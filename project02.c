@@ -60,7 +60,8 @@ GLuint attenuation_a_loc, attenuation_b_loc, attenuation_c_loc;
 float attenuation_a = 0.0; float attenuation_b = 0.0, attenuation_c = 1;
 mat4 rotation_matrix;
 mat4 sun_ctm = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
-int spot_ind = 0; GLuint spot_ind_location;
+int spot_ind = 1; 
+GLuint spot_ind_location;
 
 typedef enum
 {
@@ -109,7 +110,7 @@ typedef enum
 state currentState = NONE;
 int isAnimating = 0;
 int current_step = 0;
-int max_steps = 12;
+int max_steps = 50;
 direction current_direction = NORTH;
 cell maze_location = {0,0,-1};
 post** maze_struct;
@@ -1236,6 +1237,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
         diff_ind = 0;
         amb_ind = 0;
         spec_ind = 1;
+        light = eye;
     }
     
     // move sun
@@ -1277,7 +1279,7 @@ void mouse(int button, int state, int x, int y)
     // move flashlight 
     if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
     {
-       
+        
     }
 
     glutPostRedisplay();
@@ -1384,7 +1386,7 @@ void idle(void)
                 eye.x = width*4-1;
                 eye.y = wid+4.1;
                 eye.z = length*4.3;
-                
+
                 look.z = wid+4.1;
                 model_view = look_at(eye.x, eye.y, eye.z, look.x, look.y, look.z, 0,1,0);
             }

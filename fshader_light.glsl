@@ -11,7 +11,7 @@ uniform float shininess;
 uniform float attenuation_constant, attenuation_linear, attenuation_quadratic;
 uniform int light_ind, amb_ind, diff_ind, spec_ind, spot_ind;
 
-vec4 ambient, diffuse, specular;
+vec4 ambient, diffuse, specular, light_position;
 
 void main()
 {
@@ -38,9 +38,6 @@ void main()
 		if(mod(spec_ind, 2) != 0) {
 			gl_FragColor -= attenuation * specular;
 		}
-		if(mod(spot_ind, 2) != 0) {
-			gl_FragColor = ambient + attenuation * (diffuse + specular);
-		}
 
 		// on
 		if(mod(amb_ind, 2) == 0) {
@@ -53,7 +50,15 @@ void main()
 			gl_FragColor += attenuation * specular;
 		}
 		if(mod(spot_ind, 2) == 0) {
-			
+			float spotlight = 0;
+			float angle = dot(-LL, -NN);
+			if (angle > cos(0.03)) {
+				spotlight = angle;
+				gl_FragColor += attenuation * spotlight * diffuse;
+			}
+			else {
+				gl_FragColor = ambient * 0.5;
+			}
 		}
 	}
 	else {
