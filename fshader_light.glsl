@@ -51,7 +51,7 @@ void main()
 		}
 		if(mod(spot_ind, 2) == 0) {
 			float spotlight = 0;
-			float angle = dot(-LL, -NN);
+			float angle = dot(LL, NN);
 			if (angle > cos(0.03)) {
 				spotlight = angle;
 				gl_FragColor += attenuation * spotlight * diffuse;
