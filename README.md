@@ -31,8 +31,3 @@ space: return to inital view
 2: move sun south\
 3: move sun east\
 4: move sun west
-
-#### still need to do?
-- animation for back to original view
-- types of light (on & off)
-- flashlight
